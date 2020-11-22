@@ -16,4 +16,9 @@ public class CancellableEvent extends Event {
     protected void setCancellable(boolean state) {
         this.cancellable = state;
     }
+
+    public boolean postCancellable() {
+        post();
+        return isCancelled();
+    }
 }

@@ -6,6 +6,7 @@
   "verbose": true,
   "mixins": [
     "impl.MixinMinecraft",
-    "impl.MixinNetHandlerPlayClient"
+    "impl.MixinNetHandlerPlayClient",
+    "impl.MixinWorld"
   ]
 }
