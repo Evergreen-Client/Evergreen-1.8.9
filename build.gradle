@@ -1,0 +1,96 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        jcenter()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+        maven {
+            name = 'sponge'
+            url = 'https://repo.spongepowered.org/maven'
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.1-SNAPSHOT'
+        classpath 'org.spongepowered:mixingradle:0.6-SNAPSHOT'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.tweaker-client'
+apply plugin: 'org.spongepowered.mixin'
+apply plugin: 'java'
+
+version = "1.0"
+group = "net.evergreen"
+archivesBaseName = "Evergreen Client"
+
+sourceCompatibility = targetCompatibility = 1.8
+
+minecraft {
+    version = "1.8.9"
+    tweakClass = "net.evergreen.client.mixins.EvergreenTweaker"
+    runDir = "run"
+    mappings = "stable_22"
+}
+
+mixin {
+    defaultObfuscationEnv = "notch"
+    add sourceSets.main, "mixins.evergreen.refmap.json"
+}
+
+repositories {
+    maven { url "https://jitpack.io" }
+    maven {
+        name = 'sponge'
+        url = 'https://repo.spongepowered.org/maven/'
+    }
+    mavenCentral()
+    jcenter()
+}
+
+configurations {
+    embed
+    compile.extendsFrom(embed)
+}
+
+dependencies {
+    embed('org.spongepowered:mixin:0.7.11-SNAPSHOT') {
+        exclude module: 'launchwrapper'
+        exclude module: 'guava'
+        exclude module: 'gson'
+        exclude module: 'commons-io'
+    }
+    embed 'org.slick2d:slick2d-core:1.0.2'
+    embed 'org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.3.61'
+    embed 'com.github.mew:Slothpixel-JVM:master-SNAPSHOT'
+    embed 'com.jagrosh:DiscordIPC:0.4'
+    embed 'se.michaelthelin.spotify:spotify-web-api-java:6.3.0'
+}
+
+jar {
+    dependsOn configurations.compile
+    from {
+        configurations.embed.collect {
+            it.isDirectory() ? it : zipTree(it)
+        }
+    }
+
+    manifest.attributes(
+            "MixinConfigs": 'mixins.evergreen.json',
+            "TweakClass": 'net.evergreen.client.mixins.EvergreenTweaker',
+            "TweakOrder": 0,
+            "Manifest-Version": 1.0
+    )
+
+    configurations.embed.each { dep ->
+        from(project.zipTree(dep)) {
+            exclude 'META-INF', 'META-INF/**'
+        }
+        from(project.zipTree(dep)) {
+            include 'META-INF/services', 'META-INF/services/**'
+        }
+    }
+
+    exclude 'META-INF/*.RSA', 'META-INF/*.SF', 'META-INF/*.DSA'
+}
