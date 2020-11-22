@@ -1,0 +1,11 @@
+{
+  "required": true,
+  "compatibilityLevel": "JAVA_8",
+  "package": "net.evergreen.client.mixins",
+  "refmap": "mixins.evergreen.refmap.json",
+  "verbose": true,
+  "mixins": [
+    "impl.MixinMinecraft",
+    "impl.MixinNetHandlerPlayClient"
+  ]
+}
