@@ -16,32 +16,36 @@
 
 package net.evergreen.client.setting;
 
-import java.awt.*;
+import java.util.Arrays;
+import java.util.List;
 
-public class ColorSetting extends Setting {
+public class ArraySetting extends Setting {
 
-    private Color color;
-    private boolean allowAlpha;
+    private int index;
+    private final List<String> options;
 
-    public ColorSetting(Color def, String displayName, String description, boolean allowAlpha) {
+    public ArraySetting(String displayName, String description, String defaultMode, String... modes) {
         super(displayName, description);
-        this.color = def;
-        this.allowAlpha = allowAlpha;
+        this.options = Arrays.asList(modes);
+        this.index = this.options.indexOf(defaultMode);
     }
 
-    public Color getColor() {
-        return color;
+    public String get() {
+        return options.get(index);
     }
 
-    public void setColor(Color color) {
-        this.color = color;
+    public void set(String option) {
+        index = options.indexOf(option);
     }
 
-    public boolean allowAlpha() {
-        return allowAlpha;
+    public boolean is(String option) {
+        return index == options.indexOf(option);
     }
 
-    public void setAllowAlpha(boolean allowAlpha) {
-        this.allowAlpha = allowAlpha;
+    public void cycle() {
+        if (index < options.size() - 1)
+            index++;
+        else
+            index = 0;
     }
 }
