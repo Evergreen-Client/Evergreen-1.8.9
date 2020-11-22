@@ -5,6 +5,8 @@
   "refmap": "mixins.evergreen.refmap.json",
   "verbose": true,
   "mixins": [
+    "impl.MixinGuiChat",
+    "impl.MixinGuiScreen",
     "impl.MixinMinecraft",
     "impl.MixinNetHandlerPlayClient",
     "impl.MixinWorld"
