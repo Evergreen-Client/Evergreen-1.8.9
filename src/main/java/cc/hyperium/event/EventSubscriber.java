@@ -1,7 +1,7 @@
 package cc.hyperium.event;
 
-import co.uk.isxander.blossom.Blossom;
 import com.google.common.base.Preconditions;
+import net.evergreen.client.Evergreen;
 import org.jetbrains.annotations.NotNull;
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.MethodVisitor;
@@ -45,7 +45,7 @@ public final class EventSubscriber {
         try {
             handler = (EventHandler) createHandler(method).getConstructor(Object.class).newInstance(instance);
         } catch (Exception e) {
-            Blossom.logger.error("Failed to register event handler {}", method);
+            Evergreen.logger.error("Failed to register event handler {}", method);
             e.printStackTrace();
         }
     }

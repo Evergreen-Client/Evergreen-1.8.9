@@ -1,6 +1,7 @@
 package cc.hyperium.event;
 
 import com.google.common.reflect.TypeToken;
+import net.evergreen.client.event.EventRenderTick;
 import net.minecraft.client.Minecraft;
 
 import java.lang.reflect.Method;
@@ -96,6 +97,9 @@ public class EventBus {
         if (event == null) {
             return;
         }
+
+        if (event instanceof EventRenderTick)
+            ALLOW_PROFILE = true;
 
         boolean profile = Minecraft.getMinecraft().isCallingFromMinecraftThread() && Minecraft.getMinecraft().theWorld != null && ALLOW_PROFILE;
         if (profile) {

@@ -1,7 +1,9 @@
 package net.evergreen.client.mixins.impl;
 
 import cc.hyperium.event.Phase;
+import net.evergreen.client.Evergreen;
 import net.evergreen.client.event.EventClientTick;
+import net.evergreen.client.event.EventModInitialization;
 import net.evergreen.client.event.EventRenderTick;
 import net.minecraft.client.Minecraft;
 import net.minecraft.profiler.Profiler;
@@ -18,6 +20,17 @@ public class MixinMinecraft {
 
     @Shadow @Final public Profiler mcProfiler;
     @Shadow private Timer timer;
+
+    @Inject(method = "startGame", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;mcLanguageManager:Lnet/minecraft/client/resources/LanguageManager;", shift = At.Shift.AFTER))
+    private void injectModPreInit(CallbackInfo ci) {
+        new Evergreen();
+        new EventModInitialization.Pre().post();
+    }
+
+    @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;checkGLError(Ljava/lang/String;)V", shift = At.Shift.BEFORE))
+    private void injectModInit(CallbackInfo ci) {
+        new EventModInitialization.Post().post();
+    }
 
     /**
      * Injects the pre render event
