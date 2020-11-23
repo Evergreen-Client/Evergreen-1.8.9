@@ -45,6 +45,10 @@ repositories {
         name = 'sponge'
         url = 'https://repo.spongepowered.org/maven/'
     }
+    maven {
+        name = 'Hypixel'
+        url = 'https://repo.hypixel.net/repository/Hypixel/'
+    }
     mavenCentral()
     jcenter()
 }
@@ -66,6 +70,7 @@ dependencies {
     embed 'com.github.mew:Slothpixel-JVM:master-SNAPSHOT'
     embed 'com.jagrosh:DiscordIPC:0.4'
     embed 'se.michaelthelin.spotify:spotify-web-api-java:6.3.0'
+    embed 'net.hypixel:HypixelAPI:3.0.0'
 }
 
 jar {
