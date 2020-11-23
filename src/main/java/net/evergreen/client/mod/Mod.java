@@ -17,10 +17,7 @@
 package net.evergreen.client.mod;
 
 import net.evergreen.client.Evergreen;
-import net.evergreen.client.setting.BooleanSetting;
-import net.evergreen.client.setting.ColorSetting;
-import net.evergreen.client.setting.NumberSetting;
-import net.evergreen.client.setting.Setting;
+import net.evergreen.client.setting.*;
 import net.evergreen.client.utils.json.BetterJsonObject;
 import net.minecraft.client.Minecraft;
 import net.minecraft.crash.CrashReport;
@@ -31,6 +28,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -79,10 +77,17 @@ public abstract class Mod {
     /**
      * Adds setting to internal list
      *
-     * @param setting setting to add
+     * @param settings settings to add
      */
-    protected final void addSetting(Setting setting) {
-        this.settings.add(setting);
+    protected final void addSetting(Setting... settings) {
+        for (Setting s : settings) {
+            if (!s.getJsonKeyName().startsWith("_")) {
+                this.settings.add(s);
+            }
+            else {
+                Evergreen.logger.warn("Settings that begin with \"_\" are not allowed, skipping.");
+            }
+        }
     }
 
     public void loadSettings() {
@@ -108,7 +113,7 @@ public abstract class Mod {
             }
 
             BetterJsonObject settingsObject = new BetterJsonObject();
-            settingsObject.addProperty("_ENABLED", enabled);
+            settingsObject.addProperty("_enabled", enabled);
             for (Setting s : settings) {
                 if (s instanceof BooleanSetting)
                     settingsObject.addProperty(s.getJsonKeyName(), ((BooleanSetting) s).getValue());
@@ -133,8 +138,8 @@ public abstract class Mod {
         // Loops through every key, finds the setting with the name of the key and parses accordingly
         for (String key : o.getAllKeys()) {
             for (Setting s : settings) {
-                if (key.equals("_ENABLED"))
-                    enabled = o.optBoolean("_ENABLED");
+                if (key.equals("_enabled"))
+                    enabled = o.optBoolean("_enabled");
                 else if (s.getJsonKeyName().equals(key)) {
                     if (s instanceof BooleanSetting)
                         ((BooleanSetting) s).setValue(o.optBoolean(key));
@@ -158,6 +163,18 @@ public abstract class Mod {
                 }
             }
         }
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean state) {
+        enabled = state;
+    }
+
+    public void toggle() {
+        enabled = !enabled;
     }
 
 }

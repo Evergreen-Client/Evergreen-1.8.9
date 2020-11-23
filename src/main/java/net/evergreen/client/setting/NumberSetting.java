@@ -19,11 +19,13 @@ package net.evergreen.client.setting;
 public class NumberSetting extends Setting {
 
     private Number value;
+    private Number min;
+    private Number max;
     private final String prefix;
     private final String suffix;
     private final StoreType type;
 
-    public NumberSetting(Number def, String displayName, String description, StoreType type, String prefix, String suffix) {
+    public NumberSetting(Number def, Number min, Number max, String displayName, String description, StoreType type, String prefix, String suffix) {
         super(displayName, description);
         this.value = def;
         this.prefix = prefix;
@@ -54,6 +56,22 @@ public class NumberSetting extends Setting {
 
     public void setValue(Number value) {
         this.value = value;
+    }
+
+    public Number getMin() {
+        return min;
+    }
+
+    public void setMin(Number min) {
+        this.min = min;
+    }
+
+    public Number getMax() {
+        return max;
+    }
+
+    public void setMax(Number max) {
+        this.max = max;
     }
 
     public String getPrefix() {

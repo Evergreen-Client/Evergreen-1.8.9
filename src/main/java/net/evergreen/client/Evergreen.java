@@ -18,8 +18,11 @@ package net.evergreen.client;
 
 import cc.hyperium.event.EventBus;
 import cc.hyperium.event.InvokeEvent;
+import cc.hyperium.event.Priority;
 import net.evergreen.client.event.EventModInitialization;
+import net.evergreen.client.gui.GuiHandler;
 import net.evergreen.client.mod.ModManager;
+import net.evergreen.client.utils.ReflectionCache;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,10 +42,17 @@ public class Evergreen {
     private static Evergreen instance;
 
     private ModManager modManager;
+    private GuiHandler guiHandler;
+    private ReflectionCache reflectionCache;
 
-    public Evergreen() {
+    private Evergreen() {
         Evergreen.instance = this;
         EventBus.INSTANCE.register(this);
+    }
+
+    public static Evergreen createInstance() {
+        instance = new Evergreen();
+        return getInstance();
     }
 
     public static Evergreen getInstance() {
@@ -51,13 +61,31 @@ public class Evergreen {
 
     @InvokeEvent
     private void preInit(EventModInitialization.Pre event) {
+        if (!dataDir.exists())
+            dataDir.mkdirs();
+
+        this.reflectionCache = new ReflectionCache();
         this.modManager = new ModManager();
         this.modManager.registerMods();
+        this.guiHandler = new GuiHandler();
+    }
+
+    @InvokeEvent(priority = Priority.HIGH)
+    private void init(EventModInitialization.Post event) {
+        this.modManager.loadModSettings();
         this.modManager.initialiseMods();
     }
 
     public ModManager getModManager() {
         return modManager;
+    }
+
+    public GuiHandler getGuiHandler() {
+        return guiHandler;
+    }
+
+    public ReflectionCache getReflectionCache() {
+        return reflectionCache;
     }
 
 }

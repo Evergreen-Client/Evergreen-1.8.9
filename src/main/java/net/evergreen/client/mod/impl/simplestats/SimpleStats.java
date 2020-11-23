@@ -17,7 +17,8 @@ public class SimpleStats extends Mod {
     public ModMeta getMetadata() {
         return new ModMeta(
                 "SimpleStats",
-                "No bullshit Hypixel stats mod",
+                "No BS Hypixel stats mod",
+                "Nora",
                 ModMeta.Category.QOL,
                 null
         );

@@ -16,9 +16,14 @@
 
 package net.evergreen.client.mod;
 
-import cc.hyperium.event.EventBus;
+import net.evergreen.client.exception.IllegalAnnotationException;
+import net.evergreen.client.mod.impl.lowhptint.LowHpTint;
+import net.evergreen.client.mod.impl.simplestats.SimpleStats;
+import net.evergreen.client.setting.ConfigPosition;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -27,8 +32,8 @@ public class ModManager {
     private List<Mod> mods = new CopyOnWriteArrayList<>();
 
     public void registerMods() {
-        // Add mods here
-        // addMod(new ExampleMod());
+        addMod(new SimpleStats());
+        addMod(new LowHpTint());
     }
 
     private void addMod(Mod mod) {
@@ -38,6 +43,12 @@ public class ModManager {
     public void initialiseMods() {
         for (Mod mod : mods) {
             mod.initialise();
+        }
+    }
+
+    public void loadModSettings() {
+        for (Mod mod : mods) {
+            mod.loadSettings();
         }
     }
 
@@ -56,6 +67,35 @@ public class ModManager {
                 mods.add(m);
         }
         return mods;
+    }
+
+    /**
+     * Gets annotated field with specified type for positioning
+     *
+     * @param modInstance instance of the mod
+     * @param type type of position
+     * @return value of position
+     */
+    public float getPosition(Mod modInstance, ConfigPosition.Type type) {
+        Float val = null;
+        Class<?> clazz = modInstance.getClass();
+        List<Field> fields = Arrays.asList(clazz.getDeclaredFields());
+        for (Field f : fields) {
+            if (f.isAnnotationPresent(ConfigPosition.class)) {
+                if (f.getAnnotation(ConfigPosition.class).type() != type) continue;
+                try {
+                    val = (Float) f.get(modInstance);
+                }
+                catch (ClassCastException e) {
+                    throw new IllegalAnnotationException();
+                }
+                catch (Exception e) {
+                    e.printStackTrace();
+                }
+                break;
+            }
+        }
+        return val;
     }
 
 }

@@ -6,6 +6,7 @@
   "verbose": true,
   "mixins": [
     "impl.MixinGuiChat",
+    "impl.MixinGuiIngame",
     "impl.MixinGuiScreen",
     "impl.MixinMinecraft",
     "impl.MixinNetHandlerPlayClient",

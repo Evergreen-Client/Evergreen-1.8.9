@@ -39,7 +39,7 @@ public class MixinMinecraft {
 
     @Inject(method = "startGame", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;mcLanguageManager:Lnet/minecraft/client/resources/LanguageManager;", shift = At.Shift.AFTER))
     private void injectModPreInit(CallbackInfo ci) {
-        new Evergreen();
+        Evergreen.createInstance();
         new EventModInitialization.Pre().post();
     }
 
