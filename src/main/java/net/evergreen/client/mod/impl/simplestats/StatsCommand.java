@@ -1,13 +1,12 @@
 package net.evergreen.client.mod.impl.simplestats;
 
-import com.google.gson.JsonObject;
+import net.evergreen.client.command.CommandBase;
 import net.evergreen.client.utils.Multithreading;
 import net.evergreen.client.utils.json.BetterJsonObject;
 import net.hypixel.api.HypixelAPI;
 import net.hypixel.api.reply.PlayerReply;
 import net.hypixel.api.util.ILeveling;
 import net.minecraft.client.Minecraft;
-import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 
@@ -27,25 +26,25 @@ public class StatsCommand extends CommandBase {
     private final String prefix = "[§6SS§9]§f ";
 
     @Override
-    public String getCommandName() {
-        return "stats";
+    public List<String> getAliases() {
+        return Arrays.asList("stats");
     }
 
     @Override
-    public String getCommandUsage(ICommandSender sender) {
+    public String getCommandUsage() {
         return "/stats [player]";
     }
 
     @Override
-    public void processCommand(ICommandSender sender, String[] args) {
+    public void processCommand(List<String> args) {
         if (args != null) {
             Multithreading.runAsync(() -> {
-                switch (args.length) {
+                switch (args.size()) {
                     case 0: {
                         err("/stats [player]");
                     }
                     case 1: {
-                        String player = args[0];
+                        String player = args.get(0);
                         try {
                             HypixelAPI api = new HypixelAPI(UUID.fromString(SimpleStats.API_KEY));
                             PlayerReply playerReply = api.getPlayerByName(player).get();
@@ -80,11 +79,6 @@ public class StatsCommand extends CommandBase {
                 }
             });
         }
-    }
-
-    @Override
-    public boolean canCommandSenderUseCommand(ICommandSender sender) {
-        return true;
     }
 
     private void err(String message) {

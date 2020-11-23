@@ -1,15 +1,15 @@
 {
   "required": true,
   "compatibilityLevel": "JAVA_8",
-  "package": "net.evergreen.client.mixins",
+  "package": "net.evergreen.client.mixins.impl",
   "refmap": "mixins.evergreen.refmap.json",
   "verbose": true,
   "mixins": [
-    "impl.MixinGuiChat",
-    "impl.MixinGuiIngame",
-    "impl.MixinGuiScreen",
-    "impl.MixinMinecraft",
-    "impl.MixinNetHandlerPlayClient",
-    "impl.MixinWorld"
+    "MixinEntityPlayerSP",
+    "MixinGuiChat",
+    "MixinGuiIngame",
+    "MixinMinecraft",
+    "MixinNetHandlerPlayClient",
+    "MixinWorld"
   ]
 }

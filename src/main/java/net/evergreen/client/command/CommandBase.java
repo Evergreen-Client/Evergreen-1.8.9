@@ -14,18 +14,24 @@
  * limitations under the License.
  */
 
-package net.evergreen.client.event;
+package net.evergreen.client.command;
 
-import cc.hyperium.event.CancellableEvent;
+import net.minecraft.command.CommandException;
 
-public class EventCommandSent extends CancellableEvent {
+import java.util.List;
 
-    public String commandName;
-    public String[] parameters;
+public abstract class CommandBase {
 
-    public EventCommandSent(String commandName, String[] args) {
-        this.commandName = commandName;
-        this.parameters = args;
+    public abstract List<String> getAliases();
+
+    public abstract void processCommand(List<String> args) throws CommandException;
+
+    public String getCommandUsage() {
+        return getAliases().get(0);
+    }
+
+    public static boolean doesStringStartWith(String original, String region) {
+        return region.regionMatches(true, 0, original, 0, original.length());
     }
 
 }

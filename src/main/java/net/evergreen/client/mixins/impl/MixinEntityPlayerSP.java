@@ -18,25 +18,29 @@ package net.evergreen.client.mixins.impl;
 
 import net.evergreen.client.command.ClientCommandHandler;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.network.NetHandlerPlayClient;
+import net.minecraft.network.play.client.C01PacketChatMessage;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GuiScreen.class)
-public class MixinGuiScreen {
+@Mixin(EntityPlayerSP.class)
+public class MixinEntityPlayerSP {
 
-    @Shadow protected Minecraft mc;
+    @Shadow @Final public NetHandlerPlayClient sendQueue;
 
     /**
+     * Place where all messages are sent, inject here for {@link ClientCommandHandler}
+     * @param msg message to be send
      * @author isXander
-     * @reason {@link ClientCommandHandler} message injection
      */
-    @Inject(method = "sendChatMessage(Ljava/lang/String;Z)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/entity/EntityPlayerSP;sendChatMessage(Ljava/lang/String;)V", shift = At.Shift.BEFORE), cancellable = true)
-    private void injectClientCommandHandler(String msg, boolean addToChat, CallbackInfo ci) {
-        if (ClientCommandHandler.instance.executeCommand(mc.thePlayer, msg) != 0) ci.cancel();
+    @Overwrite
+    public void sendChatMessage(String msg) {
+        if (ClientCommandHandler.instance.executeCommand(msg) != 0) return;
+
+        this.sendQueue.addToSendQueue(new C01PacketChatMessage(msg));
     }
 
 }

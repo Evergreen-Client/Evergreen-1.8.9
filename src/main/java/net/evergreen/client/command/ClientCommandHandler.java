@@ -19,84 +19,67 @@ package net.evergreen.client.command;
 import net.evergreen.client.event.EventCommandSent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiChat;
-import net.minecraft.command.*;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.WrongUsageException;
 import net.minecraft.util.ChatComponentTranslation;
 import net.minecraft.util.EnumChatFormatting;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static net.minecraft.util.EnumChatFormatting.*;
 
-/**
- * The class that handles client-side chat commands. You should register any
- * commands that you want handled on the client with this command handler.
- * <p>
- * If there is a command with the same name registered both on the server and
- * client, the client takes precedence!
- */
-public class ClientCommandHandler extends CommandHandler {
+public class ClientCommandHandler {
 
     public static final ClientCommandHandler instance = new ClientCommandHandler();
 
+    private List<CommandBase> commands = new ArrayList<>();
+
     public String[] latestAutoComplete = null;
 
-    /**
-     * Attempt to execute a command. This method should return the number of times that the command was executed. If the
-     * command does not exist or if the player does not have permission, 0 will be returned. A number greater than 1 can
-     * be returned if a player selector is used.
-     *
-     * @param sender  The person who executed the command. This could be an EntityPlayer, RCon Source, Command Block,
-     *                etc.
-     * @param message The raw arguments that were passed. This includes the command name.
-     * @return 1 if successfully executed, -1 if no permission or wrong usage,
-     * 0 if it doesn't exist or it was canceled (it's sent to the server)
-     */
-    @Override
-    public int executeCommand(ICommandSender sender, String message) {
+    public void registerCommand(CommandBase cmd) {
+        commands.add(cmd);
+    }
+
+    public int executeCommand(String message) {
         message = message.trim();
 
-        if (message.startsWith("/")) {
-            message = message.substring(1);
-        }
+        if (!message.startsWith("/"))
+            return 0;
 
-        String[] temp = message.split(" ");
-        String[] args = new String[temp.length - 1];
-        String commandName = temp[0];
-        System.arraycopy(temp, 1, args, 0, args.length);
-        ICommand icommand = getCommands().get(commandName);
+        message = message.substring(1);
 
-        try {
-            if (icommand == null) {
-                return 0;
-            }
+        String[] tmp = message.split(" ");
+        String[] args = new String[tmp.length - 1];
+        String commandName = tmp[0];
+        System.arraycopy(tmp, 1, args,  0, args.length);
 
-            if (icommand.canCommandSenderUseCommand(sender)) {
-                EventCommandSent event = new EventCommandSent(icommand, sender, args);
-                if (event.postCancellable()) {
-                    if (event.exception != null) {
-                        throw event.exception;
+        int count = 0;
+        for (CommandBase cmd : commands) {
+            if (cmd.getAliases().contains(commandName)) {
+                EventCommandSent event = new EventCommandSent(commandName, args);
+                if (!event.postCancellable()) {
+                    try {
+                        cmd.processCommand(Arrays.asList(event.parameters));
+                        count++;
+                    } catch (WrongUsageException wue) {
+                        Minecraft.getMinecraft().thePlayer.addChatMessage(format(RED, "commands.generic.usage", format(RED, wue.getMessage(), wue.getErrorObjects())));
+                    } catch (CommandException ce) {
+                        Minecraft.getMinecraft().thePlayer.addChatMessage(format(RED, ce.getMessage(), ce.getErrorObjects()));
+                    } catch (Throwable t) {
+                        Minecraft.getMinecraft().thePlayer.addChatMessage(format(RED, "commands.generic.exception"));
+                        t.printStackTrace();
                     }
-                    return 0;
+
                 }
-
-                icommand.processCommand(sender, args);
-                return 1;
-            } else {
-                sender.addChatMessage(format(RED, "commands.generic.permission"));
             }
-        } catch (WrongUsageException wue) {
-            sender.addChatMessage(format(RED, "commands.generic.usage", format(RED, wue.getMessage(), wue.getErrorObjects())));
-        } catch (CommandException ce) {
-            sender.addChatMessage(format(RED, ce.getMessage(), ce.getErrorObjects()));
-        } catch (Throwable t) {
-            sender.addChatMessage(format(RED, "commands.generic.exception"));
-            t.printStackTrace();
         }
-
+        if (count > 0)
+            return 1;
         return -1;
     }
 
-    // Couple of helpers because the mcp names are stupid and long...
     private ChatComponentTranslation format(EnumChatFormatting color, String str, Object... args) {
         ChatComponentTranslation ret = new ChatComponentTranslation(str, args);
         ret.getChatStyle().setColor(color);
@@ -106,27 +89,48 @@ public class ClientCommandHandler extends CommandHandler {
     public void autoComplete(String leftOfCursor) {
         latestAutoComplete = null;
 
-        if (leftOfCursor.charAt(0) == '/') {
-            leftOfCursor = leftOfCursor.substring(1);
+        if (leftOfCursor.charAt(0) != '/') return;
 
-            Minecraft mc = Minecraft.getMinecraft();
-            if (mc.currentScreen instanceof GuiChat) {
-                List<String> commands = getTabCompletionOptions(mc.thePlayer, leftOfCursor, mc.thePlayer.getPosition());
-                if (commands != null && !commands.isEmpty()) {
-                    if (leftOfCursor.indexOf(' ') == -1) {
-                        for (int i = 0; i < commands.size(); i++) {
-                            commands.set(i, GRAY + "/" + commands.get(i) + RESET);
-                        }
-                    } else {
-                        for (int i = 0; i < commands.size(); i++) {
-                            commands.set(i, GRAY + commands.get(i) + RESET);
-                        }
+        leftOfCursor = leftOfCursor.substring(1);
+
+        Minecraft mc = Minecraft.getMinecraft();
+        if (mc.currentScreen instanceof GuiChat) {
+            List<String> commands = getTabCompletionOptions(leftOfCursor);
+            if (commands != null && !commands.isEmpty()) {
+                if (leftOfCursor.indexOf(' ') == -1) {
+                    for (int i = 0; i < commands.size(); i++) {
+                        commands.set(i, GRAY + "/" + commands.get(i) + RESET);
                     }
-
-                    latestAutoComplete = commands.toArray(new String[commands.size()]);
+                } else {
+                    for (int i = 0; i < commands.size(); i++) {
+                        commands.set(i, GRAY + commands.get(i) + RESET);
+                    }
                 }
+
+                latestAutoComplete = commands.toArray(new String[0]);
             }
         }
     }
+
+    public List<String> getTabCompletionOptions(String input) {
+        String[] astring = input.split(" ", -1);
+        String s = astring[0];
+
+        if (astring.length == 1) {
+            List<String> list = new ArrayList<>();
+
+            for (CommandBase command : this.commands) {
+                if (CommandBase.doesStringStartWith(s, command.getAliases().get(0))) {
+                    list.add(command.getAliases().get(0));
+                }
+            }
+
+            return list;
+        }
+        else {
+            return null;
+        }
+    }
+
 
 }
