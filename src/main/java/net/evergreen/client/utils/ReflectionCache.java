@@ -17,6 +17,7 @@
 package net.evergreen.client.utils;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.Session;
 import net.minecraft.util.Timer;
 
 import java.lang.reflect.Field;
@@ -24,6 +25,7 @@ import java.lang.reflect.Field;
 public class ReflectionCache {
 
     public Timer timer;
+    public Session session;
 
     public ReflectionCache() {
         getCache();
@@ -36,6 +38,7 @@ public class ReflectionCache {
     private void getCache() {
         try {
             timer = (Timer) getField("timer", "field_71428_T").get(Minecraft.getMinecraft());
+            session = (Session) getField("session", "field_71449_j").get(Minecraft.getMinecraft());
         } catch (Exception e) {
             e.printStackTrace();
         }
