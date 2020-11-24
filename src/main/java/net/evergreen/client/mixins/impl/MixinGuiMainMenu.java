@@ -20,7 +20,6 @@ import net.evergreen.client.gui.NewGuiMainMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
@@ -30,7 +29,7 @@ public class MixinGuiMainMenu {
 
     @Inject(method = "initGui", at = @At(value = "HEAD"))
     private void injectNewGuiScreen(CallbackInfo ci) {
-        Minecraft.getMinecraft().displayGuiScreen(new NewGuiMainMenu());
+        //Minecraft.getMinecraft().displayGuiScreen(new NewGuiMainMenu());
     }
 
 }
