@@ -18,6 +18,7 @@ package net.evergreen.client.event.bus;
 
 import net.evergreen.client.Evergreen;
 import net.evergreen.client.exception.IllegalAnnotationException;
+import net.minecraft.client.Minecraft;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
@@ -59,7 +60,9 @@ public class EventBus {
                 // Correct event
                 if (em.getEvent().equals(event.getClass())) {
                     try {
+                        Minecraft.getMinecraft().mcProfiler.startSection(em.getMethod().getName());
                         em.getMethod().invoke(em.getInstance(), event);
+                        Minecraft.getMinecraft().mcProfiler.endSection();
                     } catch (IllegalAccessException | InvocationTargetException e) {
                         e.printStackTrace();
                     }
