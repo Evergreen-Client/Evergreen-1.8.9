@@ -16,8 +16,6 @@
 
 package net.evergreen.client.mixins.impl;
 
-import net.evergreen.client.gui.NewGuiMainMenu;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
