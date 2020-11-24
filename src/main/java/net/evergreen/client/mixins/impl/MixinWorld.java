@@ -47,7 +47,7 @@ public abstract class MixinWorld {
      */
     @Inject(method = "spawnEntityInWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getChunkFromChunkCoords(II)Lnet/minecraft/world/chunk/Chunk;", shift = At.Shift.BEFORE))
     private void injectEntityJoinWorld(Entity entityIn, CallbackInfoReturnable<Boolean> ci) {
-        if (new EventEntityJoinWorld(entityIn, (World) (Object) this).postCancellable()) ci.setReturnValue(false);
+        if (new EventEntityJoinWorld(entityIn, (World) (Object) this).post()) ci.setReturnValue(false);
     }
 
     /**
@@ -57,7 +57,7 @@ public abstract class MixinWorld {
     @Overwrite
     public void loadEntities(Collection<Entity> entityCollection) {
         for (Entity entity : entityCollection) {
-            if (!(new EventEntityJoinWorld(entity, (World) (Object) this).postCancellable())) {
+            if (!(new EventEntityJoinWorld(entity, (World) (Object) this).post())) {
                 loadedEntityList.add(entity);
                 this.onEntityAdded(entity);
             }
@@ -81,7 +81,7 @@ public abstract class MixinWorld {
         }
 
         if (!this.loadedEntityList.contains(entityIn)) {
-            if (!(new EventEntityJoinWorld(entityIn, (World) (Object) this).postCancellable()))
+            if (!(new EventEntityJoinWorld(entityIn, (World) (Object) this).post()))
                 this.loadedEntityList.add(entityIn);
         }
     }

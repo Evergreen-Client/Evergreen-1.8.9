@@ -87,7 +87,7 @@ public class ModManager {
                     val = (Float) f.get(modInstance);
                 }
                 catch (ClassCastException e) {
-                    throw new IllegalAnnotationException();
+                    throw new IllegalAnnotationException("Incorrect position object type. Should be float.");
                 }
                 catch (Exception e) {
                     e.printStackTrace();

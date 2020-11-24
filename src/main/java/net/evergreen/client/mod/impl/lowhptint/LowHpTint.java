@@ -16,10 +16,9 @@
 
 package net.evergreen.client.mod.impl.lowhptint;
 
-import cc.hyperium.event.EventBus;
-import cc.hyperium.event.InvokeEvent;
-import cc.hyperium.event.Phase;
+import net.evergreen.client.Evergreen;
 import net.evergreen.client.event.EventRenderGameOverlay;
+import net.evergreen.client.event.bus.SubscribeEvent;
 import net.evergreen.client.mod.Mod;
 import net.evergreen.client.mod.ModMeta;
 import net.evergreen.client.setting.ColorSetting;
@@ -44,9 +43,9 @@ public class LowHpTint extends Mod {
 
     private static final ResourceLocation vignette = new ResourceLocation("evergreen","mods/lowhptint/tintshape.png");
 
-    public NumberSetting health = new NumberSetting(5, 1, 20, "Health", "When the tint starts to appear.", NumberSetting.StoreType.INTEGER, "", " HP");
-    public ColorSetting color = new ColorSetting(new Color(255, 0, 0), "Color", "Color of the tint.", false);
-    public NumberSetting animationSpeed = new NumberSetting(10, 1, 20, "Animation Speed", "Determines how fast the tint appears after your health is below the set level.", NumberSetting.StoreType.INTEGER, "", "");
+    public NumberSetting health;
+    public ColorSetting color;
+    public NumberSetting animationSpeed;
 
     private float prevRed = 1;
     private float prevGreen = 1;
@@ -54,11 +53,13 @@ public class LowHpTint extends Mod {
 
     @Override
     public void initialise() {
-        addSetting(health, color, animationSpeed);
-        EventBus.INSTANCE.register(this);
+        addSetting(health = new NumberSetting(5, 1, 20, "Health", "When the tint starts to appear.", NumberSetting.StoreType.INTEGER, "", " HP"));
+        addSetting(color = new ColorSetting(new Color(255, 0, 0), "Color", "Color of the tint.", false));
+        addSetting(animationSpeed = new NumberSetting(10, 1, 20, "Animation Speed", "Determines how fast the tint appears after your health is below the set level.", NumberSetting.StoreType.INTEGER, "", ""));
+        Evergreen.EVENT_BUS.register(this);
     }
 
-    @InvokeEvent
+    @SubscribeEvent
     public void onRenderHealth(EventRenderGameOverlay.Pre event) {
         if (event.getType() == EventRenderGameOverlay.ElementType.FOOD) {
             if (isEnabled())

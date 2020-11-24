@@ -21,7 +21,6 @@ import com.mojang.authlib.AuthenticationService;
 import com.mojang.authlib.UserAuthentication;
 import com.mojang.authlib.yggdrasil.YggdrasilAuthenticationService;
 import com.mojang.util.UUIDTypeAdapter;
-import net.evergreen.client.Evergreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.Session;
 

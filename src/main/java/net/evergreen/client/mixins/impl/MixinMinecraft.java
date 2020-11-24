@@ -16,7 +16,7 @@
 
 package net.evergreen.client.mixins.impl;
 
-import cc.hyperium.event.Phase;
+import net.evergreen.client.event.bus.Phase;
 import net.evergreen.client.Evergreen;
 import net.evergreen.client.event.EventClientTick;
 import net.evergreen.client.event.EventModInitialization;
@@ -39,12 +39,13 @@ public class MixinMinecraft {
 
     @Inject(method = "startGame", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;mcLanguageManager:Lnet/minecraft/client/resources/LanguageManager;", shift = At.Shift.AFTER))
     private void injectModPreInit(CallbackInfo ci) {
-        Evergreen.createInstance();
+        Evergreen.getInstance().preInit();
         new EventModInitialization.Pre().post();
     }
 
     @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;checkGLError(Ljava/lang/String;)V", shift = At.Shift.BEFORE))
     private void injectModInit(CallbackInfo ci) {
+        Evergreen.getInstance().init();
         new EventModInitialization.Post().post();
     }
 

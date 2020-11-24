@@ -81,6 +81,7 @@ public abstract class Mod {
      */
     protected final void addSetting(Setting... settings) {
         for (Setting s : settings) {
+            System.out.println(s);
             if (!s.getJsonKeyName().startsWith("_")) {
                 this.settings.add(s);
             }

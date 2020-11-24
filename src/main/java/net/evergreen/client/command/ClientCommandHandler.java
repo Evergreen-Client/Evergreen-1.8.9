@@ -59,7 +59,7 @@ public class ClientCommandHandler {
         for (CommandBase cmd : commands) {
             if (cmd.getAliases().contains(commandName)) {
                 EventCommandSent event = new EventCommandSent(commandName, args);
-                if (!event.postCancellable()) {
+                if (!event.post()) {
                     try {
                         cmd.processCommand(Arrays.asList(event.parameters));
                         count++;

@@ -16,10 +16,7 @@
 
 package net.evergreen.client;
 
-import cc.hyperium.event.EventBus;
-import cc.hyperium.event.InvokeEvent;
-import cc.hyperium.event.Priority;
-import net.evergreen.client.event.EventModInitialization;
+import net.evergreen.client.event.bus.EventBus;
 import net.evergreen.client.gui.GuiHandler;
 import net.evergreen.client.mod.ModManager;
 import net.evergreen.client.utils.ReflectionCache;
@@ -37,6 +34,7 @@ public class Evergreen {
 
     public static final Logger logger = LogManager.getLogger("Evergreen");
     public static final File dataDir = new File(Minecraft.getMinecraft().mcDataDir, "Evergreen");
+    public static final EventBus EVENT_BUS = new EventBus();
     public static final String VERSION = "1.0";
 
     private static Evergreen instance;
@@ -46,21 +44,16 @@ public class Evergreen {
     private ReflectionCache reflectionCache;
 
     private Evergreen() {
-        Evergreen.instance = this;
-        EventBus.INSTANCE.register(this);
-    }
-
-    public static Evergreen createInstance() {
-        instance = new Evergreen();
-        return getInstance();
+        EVENT_BUS.register(this);
     }
 
     public static Evergreen getInstance() {
+        if (instance == null)
+            instance = new Evergreen();
         return instance;
     }
 
-    @InvokeEvent
-    private void preInit(EventModInitialization.Pre event) {
+    public void preInit() {
         if (!dataDir.exists())
             dataDir.mkdirs();
 
@@ -70,8 +63,7 @@ public class Evergreen {
         this.guiHandler = new GuiHandler();
     }
 
-    @InvokeEvent(priority = Priority.HIGH)
-    private void init(EventModInitialization.Post event) {
+    public void init() {
         this.modManager.loadModSettings();
         this.modManager.initialiseMods();
     }

@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package net.evergreen.client.event;
+package net.evergreen.client.event.bus;
 
-import net.evergreen.client.event.bus.CancellableEvent;
+public enum Priority {
 
-public class EventCommandSent extends CancellableEvent {
+    HIGH(-1), // Called first
+    NORMAL(0),
+    LOW(1); // Called last
 
-    public String commandName;
-    public String[] parameters;
+    public final int value;
 
-    public EventCommandSent(String commandName, String[] args) {
-        this.commandName = commandName;
-        this.parameters = args;
+    Priority(int value) {
+        this.value = value;
     }
 
+    public int getValue() {
+        return value;
+    }
 }

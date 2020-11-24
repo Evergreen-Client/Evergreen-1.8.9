@@ -14,18 +14,28 @@
  * limitations under the License.
  */
 
-package net.evergreen.client.event;
+package net.evergreen.client.event.bus;
 
-import net.evergreen.client.event.bus.CancellableEvent;
+public class CancellableEvent extends Event {
 
-public class EventCommandSent extends CancellableEvent {
+    private boolean cancelled;
+    private boolean cancellable = true;
 
-    public String commandName;
-    public String[] parameters;
-
-    public EventCommandSent(String commandName, String[] args) {
-        this.commandName = commandName;
-        this.parameters = args;
+    public void setCancelled(boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
+    public boolean isCancelled() {
+        return cancelled && cancellable;
+    }
+
+    protected void setCancellable(boolean state) {
+        this.cancellable = state;
+    }
+
+    @Override
+    public boolean post() {
+        super.post();
+        return isCancelled();
+    }
 }

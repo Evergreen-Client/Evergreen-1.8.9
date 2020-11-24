@@ -14,18 +14,15 @@
  * limitations under the License.
  */
 
-package net.evergreen.client.event;
+package net.evergreen.client.event.bus;
 
-import net.evergreen.client.event.bus.CancellableEvent;
+public enum Phase {
+    PRE("Pre"),
+    POST("Post");
 
-public class EventCommandSent extends CancellableEvent {
+    public String name;
 
-    public String commandName;
-    public String[] parameters;
-
-    public EventCommandSent(String commandName, String[] args) {
-        this.commandName = commandName;
-        this.parameters = args;
+    Phase(String name) {
+        this.name = name;
     }
-
 }

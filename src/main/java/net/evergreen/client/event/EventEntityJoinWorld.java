@@ -16,7 +16,7 @@
 
 package net.evergreen.client.event;
 
-import cc.hyperium.event.CancellableEvent;
+import net.evergreen.client.event.bus.CancellableEvent;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 

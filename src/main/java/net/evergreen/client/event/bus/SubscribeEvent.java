@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package net.evergreen.client.event;
+package net.evergreen.client.event.bus;
 
-import net.evergreen.client.event.bus.CancellableEvent;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public class EventCommandSent extends CancellableEvent {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface SubscribeEvent {
 
-    public String commandName;
-    public String[] parameters;
-
-    public EventCommandSent(String commandName, String[] args) {
-        this.commandName = commandName;
-        this.parameters = args;
-    }
+    Priority priority() default Priority.NORMAL;
 
 }

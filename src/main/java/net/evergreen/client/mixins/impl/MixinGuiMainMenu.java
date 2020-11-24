@@ -16,21 +16,21 @@
 
 package net.evergreen.client.mixins.impl;
 
-import net.evergreen.client.Evergreen;
-import net.evergreen.client.event.EventRenderGameOverlay;
-import net.minecraft.client.gui.GuiIngame;
-import net.minecraft.client.gui.ScaledResolution;
+import net.evergreen.client.gui.NewGuiMainMenu;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiMainMenu;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-@Mixin(GuiIngame.class)
-public class MixinGuiIngame {
+@Mixin(GuiMainMenu.class)
+public class MixinGuiMainMenu {
 
-    @Inject(method = "renderPlayerStats", at = @At(value = "INVOKE", target = "Lnet/minecraft/profiler/Profiler;endStartSection(Ljava/lang/String;)V", shift = At.Shift.AFTER), cancellable = true)
-    private void injectPreRenderFood(ScaledResolution res, CallbackInfo ci) {
-        if (new EventRenderGameOverlay.Pre(EventRenderGameOverlay.ElementType.FOOD, Evergreen.getInstance().getReflectionCache().timer.renderPartialTicks).post()) ci.cancel();
+    @Inject(method = "initGui", at = @At(value = "HEAD"))
+    private void injectNewGuiScreen(CallbackInfo ci) {
+        Minecraft.getMinecraft().displayGuiScreen(new NewGuiMainMenu());
     }
 
 }

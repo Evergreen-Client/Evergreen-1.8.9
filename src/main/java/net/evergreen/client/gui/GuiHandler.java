@@ -16,10 +16,10 @@
 
 package net.evergreen.client.gui;
 
-import cc.hyperium.event.EventBus;
-import cc.hyperium.event.InvokeEvent;
-import cc.hyperium.event.Phase;
+import net.evergreen.client.Evergreen;
+import net.evergreen.client.event.bus.Phase;
 import net.evergreen.client.event.EventClientTick;
+import net.evergreen.client.event.bus.SubscribeEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 
@@ -28,21 +28,22 @@ public class GuiHandler {
     private GuiScreen screen = null;
 
     public GuiHandler() {
-        EventBus.INSTANCE.register(this);
+        Evergreen.EVENT_BUS.register(this);
     }
 
     public void open(GuiScreen screen) {
         this.screen = screen;
     }
 
-    @InvokeEvent
-    private void tick(EventClientTick event) {
+    @SubscribeEvent
+    public void tick(EventClientTick event) {
         if (event.phase == Phase.PRE) {
             if (screen != null) {
                 Minecraft.getMinecraft().displayGuiScreen(screen);
                 screen = null;
             }
         }
+        System.out.println("ok");
     }
 
 }

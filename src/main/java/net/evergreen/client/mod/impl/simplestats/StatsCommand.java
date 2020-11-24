@@ -7,7 +7,6 @@ import net.hypixel.api.HypixelAPI;
 import net.hypixel.api.reply.PlayerReply;
 import net.hypixel.api.util.ILeveling;
 import net.minecraft.client.Minecraft;
-import net.minecraft.command.ICommandSender;
 import net.minecraft.util.ChatComponentText;
 
 import java.math.BigInteger;
@@ -23,7 +22,7 @@ import java.util.UUID;
  */
 public class StatsCommand extends CommandBase {
     private final Minecraft mc = Minecraft.getMinecraft();
-    private final String prefix = "[§6SS§9]§f ";
+    private final String prefix = "§9[§6SS§9]§f ";
 
     @Override
     public List<String> getAliases() {
@@ -40,10 +39,10 @@ public class StatsCommand extends CommandBase {
         if (args != null) {
             Multithreading.runAsync(() -> {
                 switch (args.size()) {
-                    case 0: {
+                    case 0:
                         err("/stats [player]");
-                    }
-                    case 1: {
+                        break;
+                    case 1:
                         String player = args.get(0);
                         try {
                             HypixelAPI api = new HypixelAPI(UUID.fromString(SimpleStats.API_KEY));
@@ -71,11 +70,11 @@ public class StatsCommand extends CommandBase {
                             err("An error occurred. See logs for more details");
                             e.printStackTrace();
                         }
-                    }
-                    default: {
+                        break;
+                    default:
                         err("This function has not yet been implemented.");
                         // TODO other games
-                    }
+
                 }
             });
         }

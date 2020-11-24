@@ -16,7 +16,7 @@
 
 package net.evergreen.client.event;
 
-import cc.hyperium.event.Event;
+import net.evergreen.client.event.bus.Event;
 
 public class EventModInitialization {
 

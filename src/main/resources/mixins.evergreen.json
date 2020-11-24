@@ -8,6 +8,7 @@
     "MixinEntityPlayerSP",
     "MixinGuiChat",
     "MixinGuiIngame",
+    "MixinGuiMainMenu",
     "MixinMinecraft",
     "MixinNetHandlerPlayClient",
     "MixinWorld"
