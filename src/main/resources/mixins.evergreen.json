@@ -5,6 +5,7 @@
   "refmap": "mixins.evergreen.refmap.json",
   "verbose": true,
   "mixins": [
+    "MixinEntityFX",
     "MixinEntityPlayerSP",
     "MixinGuiChat",
     "MixinGuiIngame",

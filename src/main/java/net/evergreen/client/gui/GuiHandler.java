@@ -43,7 +43,6 @@ public class GuiHandler {
                 screen = null;
             }
         }
-        System.out.println("ok");
     }
 
 }

@@ -17,6 +17,7 @@
 package net.evergreen.client.mod;
 
 import net.evergreen.client.exception.IllegalAnnotationException;
+import net.evergreen.client.mod.impl.betterparticles.BetterParticles;
 import net.evergreen.client.mod.impl.lowhptint.LowHpTint;
 import net.evergreen.client.mod.impl.simplestats.SimpleStats;
 import net.evergreen.client.setting.ConfigPosition;
@@ -29,11 +30,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ModManager {
 
-    private List<Mod> mods = new CopyOnWriteArrayList<>();
+    private final List<Mod> mods = new CopyOnWriteArrayList<>();
 
     public void registerMods() {
         addMod(new SimpleStats());
         addMod(new LowHpTint());
+        addMod(new BetterParticles());
     }
 
     private void addMod(Mod mod) {

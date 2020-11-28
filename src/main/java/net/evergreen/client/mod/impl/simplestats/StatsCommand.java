@@ -1,6 +1,7 @@
 package net.evergreen.client.mod.impl.simplestats;
 
 import net.evergreen.client.command.CommandBase;
+import net.evergreen.client.gui.NotificationToast;
 import net.evergreen.client.utils.Multithreading;
 import net.evergreen.client.utils.json.BetterJsonObject;
 import net.hypixel.api.HypixelAPI;
@@ -85,7 +86,7 @@ public class StatsCommand extends CommandBase {
     }
 
     private void put(String msg) {
-        mc.thePlayer.addChatMessage(new ChatComponentText(msg));
+        NotificationToast.INSTANCE.notify(msg);
     }
 
     private String parseTime(long timestamp) {
