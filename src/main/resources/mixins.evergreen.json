@@ -1,7 +1,7 @@
 {
   "required": true,
   "compatibilityLevel": "JAVA_8",
-  "package": "net.evergreen.client.mixins.impl",
+  "package": "net.evergreen.client.mixins.inject",
   "refmap": "mixins.evergreen.refmap.json",
   "verbose": true,
   "mixins": [
@@ -10,6 +10,7 @@
     "MixinGuiChat",
     "MixinGuiIngame",
     "MixinGuiMainMenu",
+    "MixinLayerArmorBase",
     "MixinMinecraft",
     "MixinNetHandlerPlayClient",
     "MixinWorld"

@@ -20,6 +20,7 @@ import net.evergreen.client.exception.IllegalAnnotationException;
 import net.evergreen.client.mod.impl.betterparticles.BetterParticles;
 import net.evergreen.client.mod.impl.lowhptint.LowHpTint;
 import net.evergreen.client.mod.impl.simplestats.SimpleStats;
+import net.evergreen.client.mod.impl.transparentarmour.TransparentArmour;
 import net.evergreen.client.setting.ConfigPosition;
 
 import java.lang.reflect.Field;
@@ -36,6 +37,7 @@ public class ModManager {
         addMod(new SimpleStats());
         addMod(new LowHpTint());
         addMod(new BetterParticles());
+        addMod(new TransparentArmour());
     }
 
     private void addMod(Mod mod) {

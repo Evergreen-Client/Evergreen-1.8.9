@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package net.evergreen.client.mixins.impl;
+package net.evergreen.client.mixins.inject;
 
 import net.evergreen.client.Evergreen;
 import net.evergreen.client.event.EventRenderGameOverlay;
