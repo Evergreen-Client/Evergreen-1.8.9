@@ -66,6 +66,7 @@ public class Evergreen {
 
         this.reflectionCache = new ReflectionCache();
         this.modManager = new ModManager();
+        this.modManager.injectExternalMods();
         this.modManager.registerMods();
         this.guiHandler = new GuiHandler();
         this.evergreenRPC = new EvergreenRPC();

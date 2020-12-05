@@ -16,15 +16,13 @@
 
 package net.evergreen.client.mixins.inject;
 
+import net.evergreen.client.event.EventEntityAttackEntity;
 import net.evergreen.client.event.EventEntityJoinWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
@@ -36,14 +34,12 @@ import java.util.List;
 public abstract class MixinWorld {
 
     @Shadow @Final public List<Entity> loadedEntityList;
-
     @Shadow protected abstract void onEntityAdded(Entity entityIn);
-
     @Shadow public abstract Chunk getChunkFromChunkCoords(int chunkX, int chunkZ);
 
     /**
      * @author isXander
-     * @reason event hook
+     * @reason event hook {@link EventEntityAttackEntity}
      */
     @Inject(method = "spawnEntityInWorld", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getChunkFromChunkCoords(II)Lnet/minecraft/world/chunk/Chunk;", shift = At.Shift.BEFORE))
     private void injectEntityJoinWorld(Entity entityIn, CallbackInfoReturnable<Boolean> ci) {
@@ -52,7 +48,7 @@ public abstract class MixinWorld {
 
     /**
      * @author isXander
-     * @reason event hook
+     * @reason event hook {@link EventEntityAttackEntity}
      */
     @Overwrite
     public void loadEntities(Collection<Entity> entityCollection) {
@@ -66,7 +62,7 @@ public abstract class MixinWorld {
 
     /**
      * @author isXander
-     * @reason event hook
+     * @reason event hook {@link EventEntityAttackEntity}
      */
     @Overwrite
     public void joinEntityInSurroundings(Entity entityIn) {
@@ -84,6 +80,16 @@ public abstract class MixinWorld {
             if (!(new EventEntityJoinWorld(entityIn, (World) (Object) this).post()))
                 this.loadedEntityList.add(entityIn);
         }
+    }
+
+    /**
+     * @return horizon level
+     * @author isXander
+     * @reason Void flicker fix
+     */
+    @Overwrite
+    public double getHorizon() {
+        return 0.0D;
     }
 
 }

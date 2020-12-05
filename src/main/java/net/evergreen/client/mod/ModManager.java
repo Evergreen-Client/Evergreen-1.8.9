@@ -17,6 +17,7 @@
 package net.evergreen.client.mod;
 
 import com.google.common.reflect.ClassPath;
+import net.evergreen.client.Evergreen;
 import net.evergreen.client.exception.IllegalAnnotationException;
 import net.evergreen.client.mod.impl.betterparticles.BetterParticles;
 import net.evergreen.client.mod.impl.extracontrols.ExtraControls;
@@ -24,8 +25,16 @@ import net.evergreen.client.mod.impl.lowhptint.LowHpTint;
 import net.evergreen.client.mod.impl.simplestats.SimpleStats;
 import net.evergreen.client.mod.impl.transparentarmour.TransparentArmour;
 import net.evergreen.client.setting.ConfigPosition;
+import net.evergreen.client.utils.FileUtils;
+import net.evergreen.client.utils.JarLoader;
+import net.evergreen.client.utils.json.BetterJsonObject;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.util.ReportedException;
+import org.apache.commons.io.FilenameUtils;
 import org.reflections.Reflections;
+import org.reflections.ReflectionsException;
 
+import java.io.File;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,13 +53,28 @@ public class ModManager {
      * @author isXander
      */
     public void registerMods() {
-        Reflections reflections = new Reflections("net.evergreen.client.mod.impl");
-        for (Class<? extends Mod> m : reflections.getSubTypesOf(Mod.class)) {
+        // Easier than registering each mod manually
+        Reflections r1 = new Reflections("net.evergreen.client.mod.impl");
+        for (Class<? extends Mod> m : r1.getSubTypesOf(Mod.class)) {
             try {
                 addMod(m.newInstance());
             } catch (Exception e) {
                 e.printStackTrace();
             }
+        }
+
+        // Repeat for external mods...
+        Reflections r2 = new Reflections("evergreen");
+        try {
+            for (Class<? extends Mod> m : r2.getSubTypesOf(Mod.class)) {
+                try {
+                    addMod(m.newInstance());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        catch (ReflectionsException e) {
         }
     }
 
@@ -73,6 +97,13 @@ public class ModManager {
         }
     }
 
+    /**
+     * Gets mod from registered list using class
+     *
+     * @param clazz class of mod
+     * @return instance of mod that has been registered
+     * @author isXander
+     */
     public Mod getMod(Class<? extends Mod> clazz) {
         return mods.stream().filter(m -> m.getClass().getName().equals(clazz.getName())).findAny().orElse(null);
     }
@@ -81,6 +112,13 @@ public class ModManager {
         return mods;
     }
 
+    /**
+     * Gets all mods with certain category
+     *
+     * @param category category to filter
+     * @return list of mods with certain category
+     * @author isXander
+     */
     public List<Mod> getMods(ModMeta.Category category) {
         List<Mod> mods = new ArrayList<>();
         for (Mod m : getMods()) {
@@ -96,6 +134,7 @@ public class ModManager {
      * @param modInstance instance of the mod
      * @param type type of position
      * @return value of position
+     * @author isXander
      */
     public float getPosition(Mod modInstance, ConfigPosition.Type type) {
         Float val = null;
@@ -117,6 +156,35 @@ public class ModManager {
             }
         }
         return val;
+    }
+
+    /**
+     * Injects jar files in mod folder into classpath
+     * so {@link ModManager} can find and register mod
+     * classes to load.
+     *
+     * @author isXander
+     */
+    public void injectExternalMods() {
+        File modFolder = new File(Evergreen.dataDir, "mods");
+        if (modFolder.exists()) {
+            for (File f : modFolder.listFiles()) {
+                if (f.isFile()) {
+                    if (FilenameUtils.getExtension(f.getName()).equalsIgnoreCase("jar")) {
+                        try {
+                            JarLoader.addToClasspath(f);
+                        }
+                        catch (UnsupportedClassVersionError e) {
+                            throw new ReportedException(CrashReport.makeCrashReport(e, "Could not load mod " + f.getName()
+                                    + "\nThis is because the mod was built with a newer JDK"
+                                    + "\nTo fix this, make sure you are building your project with Java 8"));
+                        }
+                    }
+                }
+            }
+        } else {
+            modFolder.mkdirs();
+        }
     }
 
 }

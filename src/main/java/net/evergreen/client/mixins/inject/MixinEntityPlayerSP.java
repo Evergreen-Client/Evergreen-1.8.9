@@ -20,10 +20,7 @@ import net.evergreen.client.command.ClientCommandHandler;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.play.client.C01PacketChatMessage;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Overwrite;
-import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.*;
 
 @Mixin(EntityPlayerSP.class)
 public class MixinEntityPlayerSP {

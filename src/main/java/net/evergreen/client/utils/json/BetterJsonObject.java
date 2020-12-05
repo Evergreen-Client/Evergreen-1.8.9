@@ -216,4 +216,13 @@ public class BetterJsonObject {
             return new BetterJsonObject(builder.trim());
         return new BetterJsonObject();
     }
+
+    public static BetterJsonObject getFromLines(List<String> lines) {
+        if (lines.isEmpty())
+            return new BetterJsonObject();
+        String builder = String.join("", lines);
+        if (builder.trim().length() > 0)
+            return new BetterJsonObject(builder.trim());
+        return new BetterJsonObject();
+    }
 }
