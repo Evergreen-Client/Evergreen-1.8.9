@@ -17,7 +17,11 @@
 package net.evergreen.client.anticheat;
 
 import net.evergreen.client.Evergreen;
+import net.evergreen.client.utils.ServerUtils;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ChatStyle;
+import net.minecraft.util.EnumChatFormatting;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -33,7 +37,10 @@ public class Check {
 
     protected void logSuspicion(String info) {
         logger.warn(String.format("(%s) %s", name, info));
-        Evergreen.getInstance().getAntiCheatManager().suspicionLevel += 0.1f;
+        ServerUtils.kickFromServer(
+                new ChatComponentText("Evergreen has detected you to be hacking. " +
+                        "You have been kicked to prevent further damage to the server.")
+                        .setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)));
     }
 
 }

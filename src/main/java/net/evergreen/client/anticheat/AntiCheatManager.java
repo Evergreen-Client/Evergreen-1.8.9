@@ -33,8 +33,6 @@ public class AntiCheatManager {
 
     private final List<Check> checks = new CopyOnWriteArrayList<>();
 
-    public float suspicionLevel = 0f;
-
     public void start() {
         registerChecks();
         Evergreen.EVENT_BUS.register(this);
@@ -54,16 +52,6 @@ public class AntiCheatManager {
     private void addCheck(Check check) {
         if (!checks.contains(check))
             checks.add(check);
-    }
-
-    @SubscribeEvent
-    public void onClientTick(EventClientTick event) {
-        if (suspicionLevel > 1.0f) {
-            ServerUtils.kickFromServer(
-                    new ChatComponentText("Evergreen has detected you to be hacking. " +
-                            "You have been kicked to prevent further damage to the server.")
-                            .setChatStyle(new ChatStyle().setColor(EnumChatFormatting.RED)));
-        }
     }
 
 }
