@@ -46,8 +46,6 @@ public abstract class Mod {
         this.mc = Minecraft.getMinecraft();
         this.enabled = false;
         this.configFile = new File(new File(Evergreen.dataDir, "modules"), getMetadata().getName() + ".json");
-        this.initialise();
-        this.loadSettings();
     }
 
     public final List<Setting> getSettings() {
@@ -61,6 +59,14 @@ public abstract class Mod {
      * @return metadata for gui
      */
     public abstract ModMeta getMetadata();
+
+    /**
+     * Tells Mod Manager if this mod should be always on and hidden in GUIs
+     * @author isXander
+     */
+    public boolean backendMod() {
+        return false;
+    }
 
     /**
      * Making it as forge-compatible as possible
@@ -81,7 +87,6 @@ public abstract class Mod {
      */
     protected final void addSetting(Setting... settings) {
         for (Setting s : settings) {
-            System.out.println(s);
             if (!s.getJsonKeyName().startsWith("_")) {
                 this.settings.add(s);
             }

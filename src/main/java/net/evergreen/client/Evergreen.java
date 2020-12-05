@@ -16,6 +16,8 @@
 
 package net.evergreen.client;
 
+import net.evergreen.client.anticheat.AntiCheatManager;
+import net.evergreen.client.discord.EvergreenRPC;
 import net.evergreen.client.event.bus.EventBus;
 import net.evergreen.client.gui.GuiHandler;
 import net.evergreen.client.mod.ModManager;
@@ -23,6 +25,7 @@ import net.evergreen.client.utils.ReflectionCache;
 import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.lwjgl.opengl.Display;
 
 import java.io.File;
 
@@ -42,6 +45,8 @@ public class Evergreen {
     private ModManager modManager;
     private GuiHandler guiHandler;
     private ReflectionCache reflectionCache;
+    private EvergreenRPC evergreenRPC;
+    private AntiCheatManager antiCheatManager;
 
     private Evergreen() {
         EVENT_BUS.register(this);
@@ -57,14 +62,20 @@ public class Evergreen {
         if (!dataDir.exists())
             dataDir.mkdirs();
 
+        Display.setTitle("Evergreen Client " + VERSION);
+
         this.reflectionCache = new ReflectionCache();
         this.modManager = new ModManager();
         this.modManager.registerMods();
         this.guiHandler = new GuiHandler();
+        this.evergreenRPC = new EvergreenRPC();
+        this.antiCheatManager = new AntiCheatManager();
     }
 
     public void init() {
+        this.antiCheatManager.start();
         this.modManager.loadModSettings();
+        this.evergreenRPC.init();
         this.modManager.initialiseMods();
     }
 
@@ -78,6 +89,10 @@ public class Evergreen {
 
     public ReflectionCache getReflectionCache() {
         return reflectionCache;
+    }
+
+    public AntiCheatManager getAntiCheatManager() {
+        return antiCheatManager;
     }
 
 }

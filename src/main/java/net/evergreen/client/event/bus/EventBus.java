@@ -25,6 +25,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.*;
 
+/**
+ * @author isXander
+ */
 public class EventBus {
 
     private final Map<Object, List<EventMethod>> registeredClasses = new HashMap<>();
@@ -57,7 +60,6 @@ public class EventBus {
     public void post(@NotNull Object event) {
         registeredClasses.forEach((object, methodList) -> {
             for (EventMethod em : methodList) {
-                // Correct event
                 if (em.getEvent().equals(event.getClass())) {
                     try {
                         Minecraft.getMinecraft().mcProfiler.startSection(em.getMethod().getName());

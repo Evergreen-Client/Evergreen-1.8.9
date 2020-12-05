@@ -22,6 +22,7 @@ import net.evergreen.client.event.EventClientTick;
 import net.evergreen.client.event.EventModInitialization;
 import net.evergreen.client.event.EventRenderTick;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.main.GameConfiguration;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.Timer;
 import org.spongepowered.asm.mixin.Final;
@@ -36,6 +37,8 @@ public class MixinMinecraft {
 
     @Shadow @Final public Profiler mcProfiler;
     @Shadow private Timer timer;
+
+    @Shadow private boolean enableGLErrorChecking;
 
     @Inject(method = "startGame", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;mcLanguageManager:Lnet/minecraft/client/resources/LanguageManager;", shift = At.Shift.AFTER))
     private void injectModPreInit(CallbackInfo ci) {
@@ -92,6 +95,17 @@ public class MixinMinecraft {
     private void injectClientTickPost(CallbackInfo ci) {
         this.mcProfiler.endStartSection("modClientTickPost");
         new EventClientTick(Phase.POST).post();
+    }
+
+    /**
+     * OpenGL error checking has been known to cause performance issues.
+     *
+     * @author isXander
+     * @reason Performance reasons
+     */
+    @Inject(method = "<init>", at = @At("RETURN"))
+    private void injectNoGLChecking(GameConfiguration gameConfig, CallbackInfo ci) {
+        this.enableGLErrorChecking = false;
     }
 
 }

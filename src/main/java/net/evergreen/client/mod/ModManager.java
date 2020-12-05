@@ -16,36 +16,53 @@
 
 package net.evergreen.client.mod;
 
+import com.google.common.reflect.ClassPath;
 import net.evergreen.client.exception.IllegalAnnotationException;
 import net.evergreen.client.mod.impl.betterparticles.BetterParticles;
+import net.evergreen.client.mod.impl.extracontrols.ExtraControls;
 import net.evergreen.client.mod.impl.lowhptint.LowHpTint;
 import net.evergreen.client.mod.impl.simplestats.SimpleStats;
 import net.evergreen.client.mod.impl.transparentarmour.TransparentArmour;
 import net.evergreen.client.setting.ConfigPosition;
+import org.reflections.Reflections;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ModManager {
 
     private final List<Mod> mods = new CopyOnWriteArrayList<>();
 
+    /**
+     * Looks through all classes in mod package for objects
+     * that extend {@link Mod} and register them
+     *
+     * @author isXander
+     */
     public void registerMods() {
-        addMod(new SimpleStats());
-        addMod(new LowHpTint());
-        addMod(new BetterParticles());
-        addMod(new TransparentArmour());
+        Reflections reflections = new Reflections("net.evergreen.client.mod.impl");
+        for (Class<? extends Mod> m : reflections.getSubTypesOf(Mod.class)) {
+            try {
+                addMod(m.newInstance());
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void addMod(Mod mod) {
-        mods.add(mod);
+        if (!mods.contains(mod))
+            mods.add(mod);
     }
 
     public void initialiseMods() {
         for (Mod mod : mods) {
+            if (mod.backendMod())
+                mod.setEnabled(true);
             mod.initialise();
         }
     }

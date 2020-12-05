@@ -17,7 +17,6 @@
 package net.evergreen.client.mixins.inject;
 
 import net.evergreen.client.command.ClientCommandHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.network.NetHandlerPlayClient;
 import net.minecraft.network.play.client.C01PacketChatMessage;
@@ -39,7 +38,6 @@ public class MixinEntityPlayerSP {
     @Overwrite
     public void sendChatMessage(String msg) {
         if (ClientCommandHandler.instance.executeCommand(msg) != 0) return;
-
         this.sendQueue.addToSendQueue(new C01PacketChatMessage(msg));
     }
 
