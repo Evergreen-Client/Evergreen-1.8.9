@@ -37,7 +37,7 @@ public abstract class MixinEntityFX {
 
     @Inject(method = "renderParticle", at = @At("HEAD"))
     private void injectOpacity(WorldRenderer worldRendererIn, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ, CallbackInfo ci) {
-        BetterParticles bp = (BetterParticles) Evergreen.getInstance().getModManager().getMod(BetterParticles.class);
+        BetterParticles bp = Evergreen.getInstance().getModManager().getMod(BetterParticles.class);
         setAlphaF(MathUtils.lerp(getAlpha(), 0, partialTicks * (bp.alphaSpeed.getFloat() / 100f)));
     }
 

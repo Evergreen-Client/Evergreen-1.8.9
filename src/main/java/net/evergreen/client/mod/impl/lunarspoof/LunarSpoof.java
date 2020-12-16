@@ -14,18 +14,16 @@
  * limitations under the License.
  */
 
-package net.evergreen.client.mod.impl.transparentarmour;
+package net.evergreen.client.mod.impl.lunarspoof;
 
-import net.evergreen.client.Evergreen;
+import net.evergreen.client.mod.Mod;
+import net.evergreen.client.mod.ModMeta;
 
-public class TransparentArmourMixinHelper {
+public class LunarSpoof extends Mod {
 
-    private static TransparentArmour mod;
-
-    public static TransparentArmour getMod() {
-        if (mod == null)
-            mod = Evergreen.getInstance().getModManager().getMod(TransparentArmour.class);
-        return mod;
+    @Override
+    public ModMeta getMetadata() {
+        return new ModMeta("LunarSpoof", "Makes servers believe you are on Lunar Client.", ModMeta.Category.OTHER, null);
     }
 
 }

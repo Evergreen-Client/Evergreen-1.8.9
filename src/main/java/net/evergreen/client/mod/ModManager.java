@@ -16,18 +16,11 @@
 
 package net.evergreen.client.mod;
 
-import com.google.common.reflect.ClassPath;
 import net.evergreen.client.Evergreen;
+import net.evergreen.client.event.bus.SubscribeEvent;
 import net.evergreen.client.exception.IllegalAnnotationException;
-import net.evergreen.client.mod.impl.betterparticles.BetterParticles;
-import net.evergreen.client.mod.impl.extracontrols.ExtraControls;
-import net.evergreen.client.mod.impl.lowhptint.LowHpTint;
-import net.evergreen.client.mod.impl.simplestats.SimpleStats;
-import net.evergreen.client.mod.impl.transparentarmour.TransparentArmour;
 import net.evergreen.client.setting.ConfigPosition;
-import net.evergreen.client.utils.FileUtils;
 import net.evergreen.client.utils.JarLoader;
-import net.evergreen.client.utils.json.BetterJsonObject;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.util.ReportedException;
 import org.apache.commons.io.FilenameUtils;
@@ -39,12 +32,15 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ModManager {
 
     private final List<Mod> mods = new CopyOnWriteArrayList<>();
+
+    public ModManager() {
+        Evergreen.EVENT_BUS.register(this);
+    }
 
     /**
      * Looks through all classes in mod package for objects
@@ -85,9 +81,9 @@ public class ModManager {
 
     public void initialiseMods() {
         for (Mod mod : mods) {
+            mod.initialise();
             if (mod.backendMod())
                 mod.setEnabled(true);
-            mod.initialise();
         }
     }
 
@@ -104,8 +100,8 @@ public class ModManager {
      * @return instance of mod that has been registered
      * @author isXander
      */
-    public Mod getMod(Class<? extends Mod> clazz) {
-        return mods.stream().filter(m -> m.getClass().getName().equals(clazz.getName())).findAny().orElse(null);
+    public <T extends Mod> T getMod(Class<? extends T> clazz) {
+        return (T)mods.stream().filter(m -> m.getClass().getName().equals(clazz.getName())).findAny().orElse(null);
     }
 
     public List<Mod> getMods() {
@@ -184,6 +180,13 @@ public class ModManager {
             }
         } else {
             modFolder.mkdirs();
+        }
+    }
+
+    @SubscribeEvent
+    public void onShutdown() {
+        for (Mod mod : mods) {
+            mod.saveSettings();
         }
     }
 

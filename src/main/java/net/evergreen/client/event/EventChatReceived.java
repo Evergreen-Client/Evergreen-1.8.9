@@ -14,18 +14,21 @@
  * limitations under the License.
  */
 
-package net.evergreen.client.mod.impl.transparentarmour;
+package net.evergreen.client.event;
 
-import net.evergreen.client.Evergreen;
+import net.evergreen.client.event.bus.CancellableEvent;
+import net.minecraft.util.IChatComponent;
 
-public class TransparentArmourMixinHelper {
+public class EventChatReceived extends CancellableEvent {
 
-    private static TransparentArmour mod;
+    public IChatComponent message;
 
-    public static TransparentArmour getMod() {
-        if (mod == null)
-            mod = Evergreen.getInstance().getModManager().getMod(TransparentArmour.class);
-        return mod;
+    /* 0: Standard Text Message 1: System message displayed as standard 2: Actionbar message */
+    public final byte type;
+
+    public EventChatReceived(byte type, IChatComponent message) {
+        this.type = type;
+        this.message = message;
     }
 
 }

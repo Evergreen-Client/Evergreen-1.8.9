@@ -14,18 +14,9 @@
  * limitations under the License.
  */
 
-package net.evergreen.client.mod.impl.transparentarmour;
+package net.evergreen.client.event;
 
-import net.evergreen.client.Evergreen;
+import net.evergreen.client.event.bus.CancellableEvent;
 
-public class TransparentArmourMixinHelper {
-
-    private static TransparentArmour mod;
-
-    public static TransparentArmour getMod() {
-        if (mod == null)
-            mod = Evergreen.getInstance().getModManager().getMod(TransparentArmour.class);
-        return mod;
-    }
-
+public class EventClientShutdown extends CancellableEvent {
 }

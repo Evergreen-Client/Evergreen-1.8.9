@@ -61,7 +61,8 @@ public class EventRenderGameOverlay {
     }
 
     public enum ElementType {
-        FOOD
+        FOOD,
+        TEXT
     }
 
 }

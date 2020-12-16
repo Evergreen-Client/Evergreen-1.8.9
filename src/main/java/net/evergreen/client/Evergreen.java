@@ -18,11 +18,16 @@ package net.evergreen.client;
 
 import net.evergreen.client.anticheat.AntiCheatManager;
 import net.evergreen.client.discord.EvergreenRPC;
+import net.evergreen.client.event.EventGuiOpen;
 import net.evergreen.client.event.bus.EventBus;
+import net.evergreen.client.event.bus.Priority;
+import net.evergreen.client.event.bus.SubscribeEvent;
 import net.evergreen.client.gui.GuiHandler;
+import net.evergreen.client.gui.screens.resourcepack.GuiResourcePacks;
 import net.evergreen.client.mod.ModManager;
 import net.evergreen.client.utils.ReflectionCache;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiScreenResourcePacks;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.Display;
@@ -94,6 +99,13 @@ public class Evergreen {
 
     public AntiCheatManager getAntiCheatManager() {
         return antiCheatManager;
+    }
+
+    @SubscribeEvent(priority = Priority.LOW)
+    public void onGuiOpen(EventGuiOpen event) {
+        if (event.screen != null && event.screen.getClass() == GuiScreenResourcePacks.class) {
+            event.setCancelled(true);
+        }
     }
 
 }

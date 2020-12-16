@@ -16,9 +16,10 @@
 
 package net.evergreen.client.utils;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
+import net.evergreen.client.Evergreen;
+
+import java.io.*;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -38,6 +39,36 @@ public class HttpsUtils {
             FileOutputStream fos = new FileOutputStream(destination);
             fos.write(data);
             fos.close();
+        }
+    }
+
+    public static String getString(String url) {
+        try {
+            HttpURLConnection httpClient =
+                    (HttpURLConnection) new URL(url).openConnection();
+            httpClient.setRequestMethod("GET");
+            httpClient.setUseCaches(false);
+            httpClient.setRequestProperty("User-Agent", "Evergreen/" + Evergreen.VERSION);
+            httpClient.setReadTimeout(15000);
+            httpClient.setConnectTimeout(15000);
+            httpClient.setDoOutput(true);
+
+            try (BufferedReader in = new BufferedReader(
+                    new InputStreamReader(httpClient.getInputStream()))) {
+
+                StringBuilder response = new StringBuilder();
+                String line;
+
+                while ((line = in.readLine()) != null) {
+                    response.append(line);
+                }
+
+                return response.toString();
+
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
         }
     }
 

@@ -14,18 +14,17 @@
  * limitations under the License.
  */
 
-package net.evergreen.client.mod.impl.transparentarmour;
+package net.evergreen.client.event;
 
-import net.evergreen.client.Evergreen;
+import net.evergreen.client.event.bus.CancellableEvent;
+import net.minecraft.client.gui.GuiScreen;
 
-public class TransparentArmourMixinHelper {
+public class EventGuiOpen extends CancellableEvent {
 
-    private static TransparentArmour mod;
+    public GuiScreen screen;
 
-    public static TransparentArmour getMod() {
-        if (mod == null)
-            mod = Evergreen.getInstance().getModManager().getMod(TransparentArmour.class);
-        return mod;
+    public EventGuiOpen(GuiScreen screen) {
+        this.screen = screen;
     }
 
 }

@@ -33,4 +33,9 @@ public class MixinGuiIngame {
         if (new EventRenderGameOverlay.Pre(EventRenderGameOverlay.ElementType.FOOD, Evergreen.getInstance().getReflectionCache().timer.renderPartialTicks).post()) ci.cancel();
     }
 
+    @Inject(method = "renderGameOverlay", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/gui/GuiIngame;renderPlayerStats(Lnet/minecraft/client/gui/ScaledResolution;)V", shift = At.Shift.AFTER))
+    private void injectPostRenderText(float partialTicks, CallbackInfo ci) {
+        new EventRenderGameOverlay.Post(EventRenderGameOverlay.ElementType.TEXT, partialTicks);
+    }
+
 }
