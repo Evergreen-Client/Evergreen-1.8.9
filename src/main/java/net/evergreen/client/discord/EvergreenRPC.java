@@ -20,6 +20,8 @@ import com.jagrosh.discordipc.IPCClient;
 import com.jagrosh.discordipc.IPCListener;
 import com.jagrosh.discordipc.entities.RichPresence;
 import net.evergreen.client.Evergreen;
+import net.evergreen.client.utils.Multithreading;
+import net.minecraft.client.Minecraft;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -44,8 +46,12 @@ public class EvergreenRPC {
         client.setListener(new IPCListener() {
             @Override
             public void onReady(IPCClient client) {
-                setPresence("Starting Client...", "Starting Client...");
-                client.sendRichPresence(builder.build());
+                new Thread(() -> {
+                    while (Evergreen.isRunning()) {
+                        setPresence(Minecraft.getMinecraft().getSession().getUsername() + " is getting " + (Minecraft.getDebugFPS() == 0 ? "*UNKNOWN*" : Minecraft.getDebugFPS()) + " fps", "https://evergreenclient.com/");
+                        Multithreading.sleep(300000);
+                    }
+                }).start();
             }
         });
         try {

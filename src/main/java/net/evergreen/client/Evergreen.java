@@ -46,6 +46,7 @@ public class Evergreen {
     public static final String VERSION = "1.0";
 
     private static Evergreen instance;
+    private static boolean running = false;
 
     private ModManager modManager;
     private GuiHandler guiHandler;
@@ -64,10 +65,10 @@ public class Evergreen {
     }
 
     public void preInit() {
+        running = true;
+
         if (!dataDir.exists())
             dataDir.mkdirs();
-
-        Display.setTitle("Evergreen Client " + VERSION);
 
         this.reflectionCache = new ReflectionCache();
         this.modManager = new ModManager();
@@ -85,6 +86,15 @@ public class Evergreen {
         this.modManager.initialiseMods();
     }
 
+    /**
+     * Used to exit any loops safely, a bit like minecraft does
+     *
+     * @author isXander
+     */
+    public static void shutdown() {
+        running = false;
+    }
+
     public ModManager getModManager() {
         return modManager;
     }
@@ -99,6 +109,14 @@ public class Evergreen {
 
     public AntiCheatManager getAntiCheatManager() {
         return antiCheatManager;
+    }
+
+    public EvergreenRPC getEvergreenRPC() {
+        return evergreenRPC;
+    }
+
+    public static boolean isRunning() {
+        return running;
     }
 
     @SubscribeEvent(priority = Priority.LOW)
