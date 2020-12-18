@@ -1,23 +1,17 @@
 /*
- * Copyright [2020] [Evergreen]
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (C) [2020] [Evergreen]
+ * This program comes with ABSOLUTELY NO WARRANTY
+ * This is free software, and you are welcome to redistribute it
+ * under certain conditions
  */
 
 package net.evergreen.client.utils;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.BlockPos;
 import net.minecraft.util.MovingObjectPosition;
@@ -82,4 +76,15 @@ public class EntityUtils {
         return dist;
     }
 
+    public static int getTotalArmorValue(EntityPlayer player)
+    {
+        int ret = 0;
+        for (int x = 0; x < player.inventory.armorInventory.length; x++) {
+            ItemStack stack = player.inventory.armorInventory[x];
+            if (stack != null && stack.getItem() instanceof ItemArmor) {
+                ret += ((ItemArmor)stack.getItem()).damageReduceAmount;
+            }
+        }
+        return ret;
+    }
 }

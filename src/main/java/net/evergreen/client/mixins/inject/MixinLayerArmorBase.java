@@ -1,17 +1,8 @@
 /*
- * Copyright [2020] [Evergreen]
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (C) [2020] [Evergreen]
+ * This program comes with ABSOLUTELY NO WARRANTY
+ * This is free software, and you are welcome to redistribute it
+ * under certain conditions
  */
 
 package net.evergreen.client.mixins.inject;
@@ -40,9 +31,9 @@ public abstract class MixinLayerArmorBase<T extends ModelBase> implements LayerR
     @Shadow protected abstract boolean isSlotForLeggings(int armorSlot);
     @Shadow protected abstract ResourceLocation getArmorResource(ItemArmor p_177181_1_, boolean p_177181_2_);
     @Shadow protected abstract ResourceLocation getArmorResource(ItemArmor p_177178_1_, boolean p_177178_2_, String p_177178_3_);
-    @Shadow private float colorB;
-    @Shadow private float colorG;
     @Shadow private float colorR;
+    @Shadow private float colorG;
+    @Shadow private float colorB;
     @Shadow private boolean skipRenderGlint;
     @Shadow protected abstract void renderGlint(EntityLivingBase entitylivingbaseIn, T modelbaseIn, float p_177183_3_, float p_177183_4_, float partialTicks, float p_177183_6_, float p_177183_7_, float p_177183_8_, float scale);
 
@@ -52,12 +43,12 @@ public abstract class MixinLayerArmorBase<T extends ModelBase> implements LayerR
      */
     @Overwrite
     private void renderLayer(EntityLivingBase entitylivingbaseIn, float p_177182_2_, float p_177182_3_, float partialTicks, float p_177182_5_, float p_177182_6_, float p_177182_7_, float scale, int armorSlot) {
-        TransparentArmour transparentArmour = TransparentArmourMixinHelper.getMod();
+        TransparentArmour transparentArmour = Evergreen.getInstance().getModManager().getMod(TransparentArmour.class);
 
         ItemStack itemstack = this.getCurrentArmor(entitylivingbaseIn, armorSlot);
 
         if (itemstack != null && itemstack.getItem() instanceof ItemArmor) {
-            float alpha = transparentArmour.opacity.getFloat() / 100;
+            float alpha = transparentArmour.opacity.getFloat() / 100f;
             ItemArmor itemarmor = (ItemArmor)itemstack.getItem();
             T t = this.getArmorModel(armorSlot);
             t.setModelAttributes(this.renderer.getMainModel());

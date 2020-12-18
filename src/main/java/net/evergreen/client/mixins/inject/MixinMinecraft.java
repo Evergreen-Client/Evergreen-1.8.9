@@ -1,17 +1,8 @@
 /*
- * Copyright [2020] [Evergreen]
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (C) [2020] [Evergreen]
+ * This program comes with ABSOLUTELY NO WARRANTY
+ * This is free software, and you are welcome to redistribute it
+ * under certain conditions
  */
 
 package net.evergreen.client.mixins.inject;
@@ -28,6 +19,7 @@ import net.minecraft.client.multiplayer.WorldClient;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.util.Timer;
+import org.lwjgl.opengl.Display;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -60,6 +52,8 @@ public abstract class MixinMinecraft {
     @Shadow private SoundHandler mcSoundHandler;
 
     @Shadow volatile boolean running;
+
+    @Shadow private static Minecraft theMinecraft;
 
     @Inject(method = "startGame", at = @At("HEAD"))
     private void injectModPreInit(CallbackInfo ci) {
@@ -176,8 +170,19 @@ public abstract class MixinMinecraft {
     @Overwrite
     public void shutdown() {
         EventClientShutdown event = new EventClientShutdown();
-        if (!event.post())
+        if (!event.post()) {
+            Evergreen.shutdown();
             this.running = false;
+        }
+    }
+
+    /**
+     * @author isXander
+     * @reason Borderless fullscreen
+     */
+    @Inject(method = "createDisplay", at = @At("RETURN"))
+    private void injectWindowTitle(CallbackInfo ci) {
+        Display.setTitle("Evergreen " + theMinecraft.getVersion() + "-" + Evergreen.VERSION);
     }
 
 }
