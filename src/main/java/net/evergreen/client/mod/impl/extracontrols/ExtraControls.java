@@ -40,7 +40,6 @@ public class ExtraControls extends Mod {
 
     @Override
     public void initialise() {
-        System.out.println("ok");
         ClientRegistry.registerKeyBind(dropStack = new KeyBinding("Drop Stack", Keyboard.KEY_LMENU, "Evergreen"));
         Evergreen.EVENT_BUS.register(this);
     }
