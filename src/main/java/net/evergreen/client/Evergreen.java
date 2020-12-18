@@ -38,6 +38,7 @@ import java.io.File;
  * Main class of Evergreen
  * Initialise things here
  */
+@SuppressWarnings({ "unused", "ResultOfMethodCallIgnored" })
 public class Evergreen {
 
     public static final Logger logger = LogManager.getLogger("Evergreen");
