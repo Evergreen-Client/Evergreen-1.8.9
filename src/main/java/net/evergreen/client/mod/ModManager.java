@@ -17,6 +17,7 @@
 package net.evergreen.client.mod;
 
 import net.evergreen.client.Evergreen;
+import net.evergreen.client.event.EventClientShutdown;
 import net.evergreen.client.event.bus.SubscribeEvent;
 import net.evergreen.client.exception.IllegalAnnotationException;
 import net.evergreen.client.setting.ConfigPosition;
@@ -184,7 +185,7 @@ public class ModManager {
     }
 
     @SubscribeEvent
-    public void onShutdown() {
+    public void onShutdown(EventClientShutdown event) {
         for (Mod mod : mods) {
             mod.saveSettings();
         }

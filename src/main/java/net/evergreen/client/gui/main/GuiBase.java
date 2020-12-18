@@ -21,6 +21,7 @@ import net.minecraft.client.gui.GuiScreen;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class GuiBase extends GuiScreen {
@@ -43,6 +44,8 @@ public class GuiBase extends GuiScreen {
             }
             for (GuiCategory list : lists) {
                 if (mouseX >= list.getX() && mouseX <= list.getX() + list.getWidth() && mouseY >= list.getY() && mouseY <= list.getY() + list.getHeight()) {
+                    lists.remove(list);
+                    lists.add(0, list);
                     list.startDragging(mouseX, mouseY);
                     break;
                 }

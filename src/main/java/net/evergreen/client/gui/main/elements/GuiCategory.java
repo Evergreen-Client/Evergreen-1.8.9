@@ -17,6 +17,7 @@
 package net.evergreen.client.gui.main.elements;
 
 import net.evergreen.client.mod.Mod;
+import net.evergreen.client.utils.StringUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 
@@ -71,12 +72,8 @@ public class GuiCategory extends Gui {
             if (pressed)
                 hovered = m;
             drawRect(x, top, x + width, bottom, (pressed ? listPressedColor.getRGB() : listBGColor.getRGB()));
-            StringBuilder sb = new StringBuilder();
-            sb.append(m.getMetadata().getName());
-            while (mc.fontRendererObj.getStringWidth(sb.toString()) > width) {
-                sb.replace(sb.length() - 5, sb.length(), "...");
-            }
-            drawString(mc.fontRendererObj, sb.toString(), x + 2, top + (height / 2) - (mc.fontRendererObj.FONT_HEIGHT / 2), (m.isEnabled() ? listEnabledColor.getRGB() : listFGColor.getRGB()));
+            String name = StringUtils.trimStringToWidth(m.getMetadata().getName(), mc.fontRendererObj, width);
+            drawString(mc.fontRendererObj, name, x + 2, top + (height / 2) - (mc.fontRendererObj.FONT_HEIGHT / 2), (m.isEnabled() ? listEnabledColor.getRGB() : listFGColor.getRGB()));
             count++;
         }
         hoveredMod = hovered;

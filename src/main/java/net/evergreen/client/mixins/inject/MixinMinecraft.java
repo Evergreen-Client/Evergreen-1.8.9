@@ -59,18 +59,16 @@ public abstract class MixinMinecraft {
 
     @Shadow private SoundHandler mcSoundHandler;
 
-    @Shadow private volatile boolean running;
+    @Shadow volatile boolean running;
 
-    @Inject(method = "startGame", at = @At(value = "FIELD", target = "Lnet/minecraft/client/Minecraft;mcLanguageManager:Lnet/minecraft/client/resources/LanguageManager;", shift = At.Shift.AFTER))
+    @Inject(method = "startGame", at = @At("HEAD"))
     private void injectModPreInit(CallbackInfo ci) {
         Evergreen.getInstance().preInit();
-        new EventModInitialization.Pre().post();
     }
 
-    @Inject(method = "startGame", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/Minecraft;checkGLError(Ljava/lang/String;)V", shift = At.Shift.BEFORE))
+    @Inject(method = "startGame", at = @At("RETURN"))
     private void injectModInit(CallbackInfo ci) {
         Evergreen.getInstance().init();
-        new EventModInitialization.Post().post();
     }
 
     /**

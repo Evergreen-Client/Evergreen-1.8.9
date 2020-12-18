@@ -14,18 +14,19 @@
  * limitations under the License.
  */
 
-package net.evergreen.client.event;
+package net.evergreen.client.utils;
 
-import net.evergreen.client.event.bus.Event;
+import net.minecraft.client.gui.FontRenderer;
 
-public class EventModInitialization {
+public class StringUtils {
 
-    public static class Pre extends Event {
-
-    }
-
-    public static class Post extends Event {
-
+    public static String trimStringToWidth(String str, FontRenderer fr, int width) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(str);
+        while (fr.getStringWidth(sb.toString()) > width) {
+            sb.replace(sb.length() - 5, sb.length(), "...");
+        }
+        return sb.toString();
     }
 
 }

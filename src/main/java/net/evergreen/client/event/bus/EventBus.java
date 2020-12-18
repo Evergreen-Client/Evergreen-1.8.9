@@ -19,6 +19,8 @@ package net.evergreen.client.event.bus;
 import net.evergreen.client.Evergreen;
 import net.evergreen.client.exception.IllegalAnnotationException;
 import net.minecraft.client.Minecraft;
+import net.minecraft.crash.CrashReport;
+import net.minecraft.util.ReportedException;
 import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.InvocationTargetException;
@@ -39,13 +41,18 @@ public class EventBus {
             SubscribeEvent annotation = m.getAnnotation(SubscribeEvent.class);
 
             if (annotation != null) {
-                Class<?> parameterType = m.getParameterTypes()[0];
-                if (parameterType == null) {
-                    throw new IllegalAnnotationException("Annotated event method did not contain parameter for event specification.");
-                }
+                try {
+                    Class<?> parameterType = m.getParameterTypes()[0];
+                    if (parameterType == null) {
+                        throw new IllegalAnnotationException("Annotated event method did not contain parameter for event specification.");
+                    }
 
-                m.setAccessible(true);
-                eventMethods.add(new EventMethod(o, m, parameterType, annotation));
+                    m.setAccessible(true);
+                    eventMethods.add(new EventMethod(o, m, parameterType, annotation));
+                }
+                catch (ArrayIndexOutOfBoundsException e) {
+                    throw new ReportedException(CrashReport.makeCrashReport(e, "Event does not contain argument."));
+                }
             }
         }
 
