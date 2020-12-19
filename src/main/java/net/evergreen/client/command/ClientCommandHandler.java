@@ -68,7 +68,7 @@ public class ClientCommandHandler {
         }
         if (count > 0)
             return 1;
-        return -1;
+        return 0;
     }
 
     private ChatComponentTranslation format(EnumChatFormatting color, String str, Object... args) {

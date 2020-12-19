@@ -38,9 +38,10 @@ public class EvergreenRPC {
             @Override
             public void onReady(IPCClient client) {
                 new Thread(() -> {
+                    Multithreading.sleep(5000);
                     while (Evergreen.isRunning()) {
-                        setPresence(Minecraft.getMinecraft().getSession().getUsername() + " is getting " + (Minecraft.getDebugFPS() == 0 ? "*UNKNOWN*" : Minecraft.getDebugFPS()) + " fps", "https://evergreenclient.com/");
-                        Multithreading.sleep(300000);
+                        setPresence(Minecraft.getMinecraft().getSession().getUsername() + " is getting " + (Minecraft.getDebugFPS() == 0 ? "?" : Minecraft.getDebugFPS()) + " fps", "https://evergreenclient.com/");
+                        Multithreading.sleep(60000);
                     }
                 }).start();
             }

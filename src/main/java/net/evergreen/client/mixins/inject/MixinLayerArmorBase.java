@@ -48,7 +48,7 @@ public abstract class MixinLayerArmorBase<T extends ModelBase> implements LayerR
         ItemStack itemstack = this.getCurrentArmor(entitylivingbaseIn, armorSlot);
 
         if (itemstack != null && itemstack.getItem() instanceof ItemArmor) {
-            float alpha = transparentArmour.opacity.getFloat() / 100f;
+            float alpha = transparentArmour.opacity / 100f;
             ItemArmor itemarmor = (ItemArmor)itemstack.getItem();
             T t = this.getArmorModel(armorSlot);
             t.setModelAttributes(this.renderer.getMainModel());

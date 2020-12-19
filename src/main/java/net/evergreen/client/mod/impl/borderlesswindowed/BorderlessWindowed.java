@@ -33,6 +33,11 @@ public class BorderlessWindowed extends Mod {
     }
 
     @Override
+    protected Mod getSelf() {
+        return this;
+    }
+
+    @Override
     protected void onEnabled() {
         fix(Minecraft.getMinecraft().isFullScreen());
     }

@@ -9,7 +9,8 @@ package net.evergreen.client.mod.impl.betterparticles;
 
 import net.evergreen.client.mod.Mod;
 import net.evergreen.client.mod.ModMeta;
-import net.evergreen.client.setting.NumberSetting;
+import net.evergreen.client.setting.Setting;
+import net.evergreen.client.setting.SettingField;
 
 public class BetterParticles extends Mod {
 
@@ -18,10 +19,16 @@ public class BetterParticles extends Mod {
         return new ModMeta("Better Particles", "Improves particle rendering to look much cleaner.", ModMeta.Category.GRAPHIC, null);
     }
 
-    public NumberSetting alphaSpeed;
+    @SettingField(
+            type = Setting.PropertyType.INTEGER,
+            name = "Opacity Speed",
+            description = "Changes how fast particles become transparent.",
+            max = 5
+    )
+    public Integer alphaSpeed = 3;
 
     @Override
-    public void initialise() {
-        addSetting(alphaSpeed = new NumberSetting(3, 0, 5, "Opacity Speed", "Changes how fast particles become transparent.", NumberSetting.StoreType.INTEGER, "", ""));
+    protected Mod getSelf() {
+        return this;
     }
 }

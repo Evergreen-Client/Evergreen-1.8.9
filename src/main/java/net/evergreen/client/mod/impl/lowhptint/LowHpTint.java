@@ -12,8 +12,8 @@ import net.evergreen.client.event.EventRenderGameOverlay;
 import net.evergreen.client.event.bus.SubscribeEvent;
 import net.evergreen.client.mod.Mod;
 import net.evergreen.client.mod.ModMeta;
-import net.evergreen.client.setting.ColorSetting;
-import net.evergreen.client.setting.NumberSetting;
+import net.evergreen.client.setting.Setting;
+import net.evergreen.client.setting.SettingField;
 import net.evergreen.client.utils.MathUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.ScaledResolution;
@@ -34,9 +34,28 @@ public class LowHpTint extends Mod {
 
     private static final ResourceLocation vignette = new ResourceLocation("evergreen/mods/lowhptint/tintshape.png");
 
-    public NumberSetting health;
-    public ColorSetting color;
-    public NumberSetting animationSpeed;
+    @SettingField(
+            type = Setting.PropertyType.INTEGER,
+            name = "Health",
+            description = "When the tint starts to appear.",
+            min = 1, max = 20
+    )
+    public Integer health = 5;
+
+    @SettingField(
+            type = Setting.PropertyType.COLOR,
+            name = "Color",
+            description = "Color of the tint."
+    )
+    public Color color = new Color(255, 0, 0);
+
+    @SettingField(
+            type = Setting.PropertyType.INTEGER,
+            name = "Animation Speed",
+            description = "Determines how fast the tint appears after your health is below the set level.",
+            min = 1, max = 20
+    )
+    public Integer animationSpeed = 10;
 
     private float prevRed = 1;
     private float prevGreen = 1;
@@ -44,10 +63,12 @@ public class LowHpTint extends Mod {
 
     @Override
     public void initialise() {
-        addSetting(health = new NumberSetting(5, 1, 20, "Health", "When the tint starts to appear.", NumberSetting.StoreType.INTEGER, "", " HP"));
-        addSetting(color = new ColorSetting(new Color(255, 0, 0), "Color", "Color of the tint.", false));
-        addSetting(animationSpeed = new NumberSetting(10, 1, 20, "Animation Speed", "Determines how fast the tint appears after your health is below the set level.", NumberSetting.StoreType.INTEGER, "", ""));
         Evergreen.EVENT_BUS.register(this);
+    }
+
+    @Override
+    protected Mod getSelf() {
+        return this;
     }
 
     @SubscribeEvent
@@ -59,7 +80,7 @@ public class LowHpTint extends Mod {
     }
 
     private void renderTint(float currentHealth, ScaledResolution res, float partialTicks) {
-        float threshold = health.getFloat();
+        float threshold = health;
         if (currentHealth <= threshold) {
             GlStateManager.pushMatrix();
             GlStateManager.enableBlend();
@@ -67,9 +88,9 @@ public class LowHpTint extends Mod {
             GlStateManager.depthMask(false);
             GlStateManager.tryBlendFuncSeparate(0, 769, 1, 0);
             float f = (threshold - currentHealth) / threshold + 1.0F / threshold * 2.0F;
-            float r = prevRed   = MathUtils.lerp(prevRed,   MathUtils.lerp(MathUtils.getPercent(color.getColor().getRed(),   0, 255), 0.0f, f), partialTicks * (animationSpeed.getFloat() / 1000f));
-            float g = prevGreen = MathUtils.lerp(prevGreen, MathUtils.lerp(MathUtils.getPercent(color.getColor().getGreen(), 0, 255), 0.0f, f), partialTicks * (animationSpeed.getFloat() / 1000f));
-            float b = prevBlue  = MathUtils.lerp(prevBlue,  MathUtils.lerp(MathUtils.getPercent(color.getColor().getBlue(),  0, 255), 0.0f, f), partialTicks * (animationSpeed.getFloat() / 1000f));
+            float r = prevRed   = MathUtils.lerp(prevRed,   MathUtils.lerp(MathUtils.getPercent(color.getRed(),   0, 255), 0.0f, f), partialTicks * (animationSpeed / 1000f));
+            float g = prevGreen = MathUtils.lerp(prevGreen, MathUtils.lerp(MathUtils.getPercent(color.getGreen(), 0, 255), 0.0f, f), partialTicks * (animationSpeed / 1000f));
+            float b = prevBlue  = MathUtils.lerp(prevBlue,  MathUtils.lerp(MathUtils.getPercent(color.getBlue(),  0, 255), 0.0f, f), partialTicks * (animationSpeed / 1000f));
             GlStateManager.color(1.0f - r, 1.0f - g, 1.0f - b, 1.0f);
             mc.getTextureManager().bindTexture(vignette);
             Tessellator tes = Tessellator.getInstance();

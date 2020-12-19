@@ -17,4 +17,9 @@ public class LunarSpoof extends Mod {
         return new ModMeta("LunarSpoof", "Makes servers believe you are on Lunar Client.", ModMeta.Category.OTHER, null);
     }
 
+    @Override
+    protected Mod getSelf() {
+        return this;
+    }
+
 }

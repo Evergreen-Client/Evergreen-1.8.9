@@ -9,7 +9,8 @@ package net.evergreen.client.mod.impl.transparentarmour;
 
 import net.evergreen.client.mod.Mod;
 import net.evergreen.client.mod.ModMeta;
-import net.evergreen.client.setting.NumberSetting;
+import net.evergreen.client.setting.Setting;
+import net.evergreen.client.setting.SettingField;
 
 public class TransparentArmour extends Mod {
 
@@ -18,10 +19,16 @@ public class TransparentArmour extends Mod {
         return new ModMeta("Transparent Armour", "Allows you to make armour render with an opacity.", ModMeta.Category.GRAPHIC, null);
     }
 
-    public NumberSetting opacity;
+    @SettingField(
+            type = Setting.PropertyType.INTEGER,
+            name = "Armour Opacity",
+            description = "Opacity percentage for armour.",
+            suffix = "%"
+    )
+    public Integer opacity = 100;
 
     @Override
-    public void initialise() {
-        addSetting(opacity = new NumberSetting(100, 0, 100, "Armour Opacity", "Opacity percentage for armour.", NumberSetting.StoreType.INTEGER, "", "%"));
+    protected Mod getSelf() {
+        return this;
     }
 }

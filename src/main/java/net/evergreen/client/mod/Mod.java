@@ -18,8 +18,8 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 
@@ -30,16 +30,17 @@ public abstract class Mod {
     private final File configFile;
     protected final Random random = new Random();
 
-    protected final List<Setting> settings;
+    protected final List<Setting<?>> settings;
 
     public Mod() {
         this.settings = new ArrayList<>();
         this.mc = Minecraft.getMinecraft();
         this.enabled = false;
-        this.configFile = new File(new File(Evergreen.dataDir, "modules"), getMetadata().getName() + ".json");
+        this.configFile = new File(new File(Evergreen.dataDir, "mods"), getMetadata().getName() + ".json");
+        discoverSettings();
     }
 
-    public final List<Setting> getSettings() {
+    public final List<Setting<?>> getSettings() {
         return settings;
     }
 
@@ -72,12 +73,24 @@ public abstract class Mod {
     }
 
     /**
+     * Needed to discover settings in child class
+     * There is probably a better way to do this
+     * but for now this is the workaround, will
+     * be changed in the future if StackOverflow
+     * question is answered
+     *
+     * @author isXander
+     * @return instance of child class
+     */
+    protected abstract Mod getSelf();
+
+    /**
      * Adds setting to internal list
      *
      * @param settings settings to add
      */
-    protected final void addSetting(Setting... settings) {
-        for (Setting s : settings) {
+    protected final void addSetting(Setting<?>... settings) {
+        for (Setting<?> s : settings) {
             if (!s.getJsonKeyName().startsWith("_")) {
                 this.settings.add(s);
             }
@@ -87,7 +100,57 @@ public abstract class Mod {
         }
     }
 
-    public void loadSettings() {
+    /**
+     * Discovers annotated fields in child class and
+     * adds them to settings accordingly
+     *
+     * @author isXander
+     */
+    private void discoverSettings() {
+        System.out.println("Discovering settings for " + getMetadata().getName());
+        for (Field f : getSelf().getClass().getDeclaredFields()) {
+            System.out.println("    Found field: " + f.getName());
+            SettingField annotation = f.getAnnotation(SettingField.class);
+            if (annotation != null) {
+                System.out.println("        Found annotation");
+                f.setAccessible(true);
+                try {
+                    // FIXME: 19/12/2020 f.get(getSelf()); is null, find out why
+                    switch (annotation.type()) {
+                        case TEXT:
+                            System.out.println("            Is type of text");
+                            addSetting(new Setting<>((String) f.get(getSelf()), annotation.type(), annotation.name(), annotation.description(), annotation.prefix(), annotation.suffix()));
+                            break;
+                        case ARRAY:
+                            System.out.println("            Is type of array");
+                            addSetting(new Setting<>((SettingArray) f.get(getSelf()), annotation.type(), annotation.name(), annotation.description(), annotation.prefix(), annotation.suffix()));
+                            break;
+                        case COLOR:
+                            System.out.println("            Is type of color");
+                            addSetting(new Setting<>((Color) f.get(getSelf()), annotation.type(), annotation.name(), annotation.description(), annotation.prefix(), annotation.suffix()));
+                            break;
+                        case FLOAT:
+                            System.out.println("            Is type of float");
+                            addSetting(new Setting<>((Float) f.get(getSelf()), annotation.type(), annotation.name(), annotation.description(), annotation.min(), annotation.max(), annotation.prefix(), annotation.suffix()));
+                            break;
+                        case BOOLEAN:
+                            System.out.println("            Is type of bool");
+                            addSetting(new Setting<>((Boolean) f.get(getSelf()), annotation.type(), annotation.name(), annotation.description(), annotation.prefix(), annotation.suffix()));
+                            break;
+                        case INTEGER:
+                            System.out.println("            Is type of int");
+                            addSetting(new Setting<>((Integer) f.get(getSelf()), annotation.type(), annotation.name(), annotation.description(), annotation.min(), annotation.max(), annotation.prefix(), annotation.suffix()));
+                            break;
+                    }
+                }
+                catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
+
+    public final void loadSettings() {
         Evergreen.logger.info("Loading " + getMetadata().getName() + " Mod.");
         try {
             parseSettings(BetterJsonObject.getFromFile(configFile));
@@ -98,7 +161,7 @@ public abstract class Mod {
         }
     }
 
-    public void saveSettings() {
+    public final void saveSettings() {
         Evergreen.logger.info("Saving " + getMetadata().getName() + " Mod.");
         try {
             if (!configFile.getParentFile().exists())
@@ -111,15 +174,42 @@ public abstract class Mod {
 
             BetterJsonObject settingsObject = new BetterJsonObject();
             settingsObject.addProperty("_enabled", enabled);
-            for (Setting s : settings) {
-                if (s instanceof BooleanSetting)
-                    settingsObject.addProperty(s.getJsonKeyName(), ((BooleanSetting) s).getValue());
-                else if (s instanceof NumberSetting)
-                    settingsObject.addProperty(s.getJsonKeyName(), ((NumberSetting) s).getValue());
-                else if (s instanceof ColorSetting)
-                    settingsObject.addProperty(s.getJsonKeyName(), ((ColorSetting) s).getColor().getRGB());
-                else
-                    Evergreen.logger.warn("Generic or unknown setting detected, ignoring.");
+            for (Setting<?> s : settings) {
+                System.out.println(s);
+                switch (s.type()) {
+                    case INTEGER:
+                        settingsObject.addProperty(s.getJsonKeyName(), (Integer) s.get());
+                        break;
+                    case BOOLEAN:
+                        settingsObject.addProperty(s.getJsonKeyName(), (Boolean) s.get());
+                        break;
+                    case FLOAT:
+                        settingsObject.addProperty(s.getJsonKeyName(), (Float) s.get());
+                        break;
+                    case COLOR:
+                        settingsObject.addProperty(s.getJsonKeyName(), ((Color)s.get()).getRGB());
+                        break;
+                    case ARRAY:
+                        settingsObject.addProperty(s.getJsonKeyName(), ((SettingArray) s.get()).getIndex());
+                        break;
+                    case TEXT:
+                        settingsObject.addProperty(s.getJsonKeyName(), (String) s.get());
+                        break;
+                }
+//                if (s.get() instanceof Boolean)
+//                    settingsObject.addProperty(s.getJsonKeyName(), (Boolean) s.get());
+//                else if (s.get() instanceof Float)
+//                    settingsObject.addProperty(s.getJsonKeyName(), (Float) s.get());
+//                else if (s.get() instanceof Color)
+//                    settingsObject.addProperty(s.getJsonKeyName(), ((Color)s.get()).getRGB());
+//                else if (s.get() instanceof Integer)
+//                    settingsObject.addProperty(s.getJsonKeyName(), (Integer) s.get());
+//                else if (s.get() instanceof SettingArray)
+//                    settingsObject.addProperty(s.getJsonKeyName(), ((SettingArray) s.get()).getIndex());
+//                else if (s.get() instanceof String)
+//                    settingsObject.addProperty(s.getJsonKeyName(), (String) s.get());
+//                else
+//                    Evergreen.logger.warn("Generic or unknown setting detected, ignoring.");
             }
 
             settingsObject.writeToFile(configFile);
@@ -130,31 +220,29 @@ public abstract class Mod {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void parseSettings(BetterJsonObject o) {
         // Nested for loops are bad and there is probably a miles better way to do this.
         // Loops through every key, finds the setting with the name of the key and parses accordingly
         for (String key : o.getAllKeys()) {
-            for (Setting s : settings) {
+            for (Setting<?> s : settings) {
                 if (key.equals("_enabled"))
-                    enabled = o.optBoolean("_enabled");
+                    setEnabled(o.optBoolean("_enabled"));
                 else if (s.getJsonKeyName().equals(key)) {
-                    if (s instanceof BooleanSetting)
-                        ((BooleanSetting) s).setValue(o.optBoolean(key));
-                    else if (s instanceof NumberSetting) {
-                        NumberSetting setting = (NumberSetting) s;
-
-                        switch (setting.getType()) {
-                            case INTEGER:
-                                setting.setValue(o.optInt(key));
-                                break;
-                            case FLOAT:
-                            case DOUBLE:
-                                setting.setValue(o.optDouble(key));
-                                break;
-                        }
-                    }
-                    else if (s instanceof ColorSetting)
-                        ((ColorSetting) s).setColor(new Color(o.optInt(key)));
+                    if (s.get() instanceof Boolean)
+                        ((Setting<Boolean>)s).set(o.optBoolean(key));
+                    else if (s.get() instanceof Double)
+                        ((Setting<Double>)s).set(o.optDouble(key));
+                    else if (s.get() instanceof Color)
+                        ((Setting<Color>) s).set(new Color(o.optInt(key)));
+                    else if (s.get() instanceof String)
+                        ((Setting<String>)s).set(o.optString(key));
+                    else if (s.get() instanceof Float)
+                        ((Setting<Float>)s).set(new Double(o.optDouble(key)).floatValue());
+                    else if (s.get() instanceof Integer)
+                        ((Setting<Integer>)s).set(o.optInt(key));
+                    else if (s.get() instanceof SettingArray)
+                        ((Setting<SettingArray>)s).get().setIndex(o.optInt(key));
                     else
                         Evergreen.logger.warn("Generic or unknown setting detected, ignoring.");
                 }

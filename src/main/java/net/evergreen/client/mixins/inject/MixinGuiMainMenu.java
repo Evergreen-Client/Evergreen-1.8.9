@@ -9,7 +9,9 @@ package net.evergreen.client.mixins.inject;
 
 import net.evergreen.client.Evergreen;
 import net.evergreen.client.discord.EvergreenRPC;
+import net.evergreen.client.gui.mainmenu.GuiEvergreenMainMenu;
 import net.evergreen.client.utils.Multithreading;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiMainMenu;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -21,7 +23,7 @@ public class MixinGuiMainMenu {
 
     @Inject(method = "initGui", at = @At(value = "HEAD"))
     private void injectNewGuiScreen(CallbackInfo ci) {
-
+        //Minecraft.getMinecraft().displayGuiScreen(new GuiEvergreenMainMenu());
     }
 
 }

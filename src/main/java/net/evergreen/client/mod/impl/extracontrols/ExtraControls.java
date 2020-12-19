@@ -35,6 +35,11 @@ public class ExtraControls extends Mod {
         Evergreen.EVENT_BUS.register(this);
     }
 
+    @Override
+    protected Mod getSelf() {
+        return this;
+    }
+
     @SubscribeEvent
     public void onClientTick(EventClientTick event) {
         if (dropStack.isPressed()) {

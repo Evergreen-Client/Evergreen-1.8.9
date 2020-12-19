@@ -10,14 +10,26 @@ package net.evergreen.client.mod.impl.simplestats;
 import net.evergreen.client.command.ClientCommandHandler;
 import net.evergreen.client.mod.Mod;
 import net.evergreen.client.mod.ModMeta;
+import net.evergreen.client.setting.Setting;
+import net.evergreen.client.setting.SettingField;
 
 public class SimpleStats extends Mod {
-    // TODO ablility to set API Key in client settings
-    public static final String API_KEY = "YOUR-API-KEY-HERE";
+
+    @SettingField(
+            type = Setting.PropertyType.TEXT,
+            name = "API Key",
+            description = "This mod uses your hypixel api key to function."
+    )
+    public String apiKey = "";
 
     @Override
     public void initialise() {
         ClientCommandHandler.instance.registerCommand(new StatsCommand());
+    }
+
+    @Override
+    protected Mod getSelf() {
+        return this;
     }
 
     @Override

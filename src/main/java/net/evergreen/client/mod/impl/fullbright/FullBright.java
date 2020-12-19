@@ -26,6 +26,11 @@ public class FullBright extends Mod {
     }
 
     @Override
+    protected Mod getSelf() {
+        return this;
+    }
+
+    @Override
     protected void onEnabled() {
         System.out.println("enabled");
         mc.gameSettings.gammaSetting = 15;

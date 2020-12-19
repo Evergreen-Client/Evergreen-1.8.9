@@ -7,6 +7,7 @@
 
 package net.evergreen.client.mod.impl.simplestats;
 
+import net.evergreen.client.Evergreen;
 import net.evergreen.client.command.CommandBase;
 import net.evergreen.client.gui.NotificationToast;
 import net.evergreen.client.utils.Multithreading;
@@ -53,7 +54,7 @@ public class StatsCommand extends CommandBase {
                     case 1:
                         String player = args.get(0);
                         try {
-                            HypixelAPI api = new HypixelAPI(UUID.fromString(SimpleStats.API_KEY));
+                            HypixelAPI api = new HypixelAPI(UUID.fromString(Evergreen.getInstance().getModManager().getMod(SimpleStats.class).apiKey));
                             PlayerReply playerReply = api.getPlayerByName(player).get();
                             if (playerReply.isSuccess()) {
                                 BetterJsonObject obj = new BetterJsonObject(playerReply.getPlayer());

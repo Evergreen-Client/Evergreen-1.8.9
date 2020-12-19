@@ -30,29 +30,17 @@ public abstract class MixinMinecraft {
 
     @Shadow @Final public Profiler mcProfiler;
     @Shadow private Timer timer;
-
     @Shadow private boolean enableGLErrorChecking;
-
     @Shadow public GuiScreen currentScreen;
-
     @Shadow public WorldClient theWorld;
-
     @Shadow public EntityPlayerSP thePlayer;
-
     @Shadow public GameSettings gameSettings;
-
     @Shadow public GuiIngame ingameGUI;
-
     @Shadow public abstract void setIngameFocus();
-
     @Shadow public abstract void setIngameNotInFocus();
-
     @Shadow public boolean skipRenderWorld;
-
     @Shadow private SoundHandler mcSoundHandler;
-
     @Shadow volatile boolean running;
-
     @Shadow private static Minecraft theMinecraft;
 
     @Inject(method = "startGame", at = @At("HEAD"))
