@@ -1,8 +1,9 @@
 /*
- * Copyright (C) [2020] [Evergreen]
+ * Copyright (C) Evergreen [2020 - 2021]
  * This program comes with ABSOLUTELY NO WARRANTY
  * This is free software, and you are welcome to redistribute it
- * under certain conditions
+ * under the certain conditions that can be found here
+ * https://www.gnu.org/licenses/lgpl-3.0.en.html
  */
 
 package net.evergreen.client.utils;
@@ -49,7 +50,7 @@ public class EntityUtils {
         mc.mcProfiler.startSection("Calculate Reach Dist");
 
         // How far will ray travel before ending
-        double maxSize = 20D;
+        double maxSize = 6D;
         // Bounding box of entity
         AxisAlignedBB otherBB = entity.getEntityBoundingBox();
         // This is where people found out that F3+B is not accurate for hitboxes,

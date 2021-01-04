@@ -1,18 +1,19 @@
 /*
- * Copyright (C) [2020] [Evergreen]
+ * Copyright (C) Evergreen [2020 - 2021]
  * This program comes with ABSOLUTELY NO WARRANTY
  * This is free software, and you are welcome to redistribute it
- * under certain conditions
+ * under the certain conditions that can be found here
+ * https://www.gnu.org/licenses/lgpl-3.0.en.html
  */
 
 package net.evergreen.client.mod;
 
 import net.evergreen.client.Evergreen;
 import net.evergreen.client.event.EventClientShutdown;
+import net.evergreen.client.event.EventRenderGameOverlay;
 import net.evergreen.client.event.bus.SubscribeEvent;
-import net.evergreen.client.exception.IllegalAnnotationException;
-import net.evergreen.client.setting.ConfigPosition;
 import net.evergreen.client.utils.JarLoader;
+import net.minecraft.client.Minecraft;
 import net.minecraft.crash.CrashReport;
 import net.minecraft.util.ReportedException;
 import org.apache.commons.io.FilenameUtils;
@@ -20,9 +21,7 @@ import org.reflections.Reflections;
 import org.reflections.ReflectionsException;
 
 import java.io.File;
-import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
@@ -45,7 +44,9 @@ public class ModManager {
         Reflections r1 = new Reflections("net.evergreen.client.mod.impl");
         for (Class<? extends Mod> m : r1.getSubTypesOf(Mod.class)) {
             try {
-                addMod(m.newInstance());
+                Mod mod = m.newInstance();
+                mod.setHudMod(m.getAnnotation(HUD.class) != null);
+                addMod(mod);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -123,36 +124,6 @@ public class ModManager {
     }
 
     /**
-     * Gets annotated field with specified type for positioning
-     *
-     * @param modInstance instance of the mod
-     * @param type type of position
-     * @return value of position
-     * @author isXander
-     */
-    public float getPosition(Mod modInstance, ConfigPosition.Type type) {
-        Float val = null;
-        Class<?> clazz = modInstance.getClass();
-        List<Field> fields = Arrays.asList(clazz.getDeclaredFields());
-        for (Field f : fields) {
-            if (f.isAnnotationPresent(ConfigPosition.class)) {
-                if (f.getAnnotation(ConfigPosition.class).type() != type) continue;
-                try {
-                    val = (Float) f.get(modInstance);
-                }
-                catch (ClassCastException e) {
-                    throw new IllegalAnnotationException("Incorrect position object type. Should be float.");
-                }
-                catch (Exception e) {
-                    e.printStackTrace();
-                }
-                break;
-            }
-        }
-        return val;
-    }
-
-    /**
      * Injects jar files in mod folder into classpath
      * so {@link ModManager} can find and register mod
      * classes to load.
@@ -184,6 +155,15 @@ public class ModManager {
     @SubscribeEvent
     public void onShutdown(EventClientShutdown event) {
         saveModSettings();
+    }
+
+    @SubscribeEvent
+    public void onRenderOverlay(EventRenderGameOverlay event) {
+        Minecraft mc = Minecraft.getMinecraft();
+        for (Mod m : mods) {
+            if (mc.currentScreen == null && mc.inGameHasFocus)
+                m.render(event);
+        }
     }
 
 }

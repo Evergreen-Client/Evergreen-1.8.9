@@ -1,8 +1,9 @@
 /*
- * Copyright (C) [2020] [Evergreen]
+ * Copyright (C) Evergreen [2020 - 2021]
  * This program comes with ABSOLUTELY NO WARRANTY
  * This is free software, and you are welcome to redistribute it
- * under certain conditions
+ * under the certain conditions that can be found here
+ * https://www.gnu.org/licenses/lgpl-3.0.en.html
  */
 
 package net.evergreen.client.mixins.inject;
@@ -16,14 +17,24 @@ import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.gui.*;
 import net.minecraft.client.main.GameConfiguration;
 import net.minecraft.client.multiplayer.WorldClient;
+import net.minecraft.client.resources.DefaultResourcePack;
+import net.minecraft.client.resources.IResourceManager;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.profiler.Profiler;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Timer;
+import net.minecraft.util.Util;
+import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.Logger;
 import org.lwjgl.opengl.Display;
 import org.spongepowered.asm.mixin.*;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.ByteBuffer;
 
 @Mixin(Minecraft.class)
 public abstract class MixinMinecraft {
@@ -42,6 +53,14 @@ public abstract class MixinMinecraft {
     @Shadow private SoundHandler mcSoundHandler;
     @Shadow volatile boolean running;
     @Shadow private static Minecraft theMinecraft;
+
+    @Shadow @Final private DefaultResourcePack mcDefaultResourcePack;
+
+    @Shadow protected abstract ByteBuffer readImageToBuffer(InputStream imageStream) throws IOException;
+
+    @Shadow @Final private static Logger logger;
+
+    @Shadow public abstract IResourceManager getResourceManager();
 
     @Inject(method = "startGame", at = @At("HEAD"))
     private void injectModPreInit(CallbackInfo ci) {
@@ -172,5 +191,37 @@ public abstract class MixinMinecraft {
     private void injectWindowTitle(CallbackInfo ci) {
         Display.setTitle("Evergreen " + theMinecraft.getVersion() + "-" + Evergreen.VERSION);
     }
+
+//    /**
+//     * @author isXander
+//     * @reason Custom icon
+//     */
+//    @Overwrite
+//    private void setWindowIcon() {
+//        Util.EnumOS os = Util.getOSType();
+//
+//        if (os != Util.EnumOS.OSX) {
+//            InputStream lowRes = null;
+//            InputStream highRes = null;
+//
+//            try {
+//
+//                lowRes = this.getResourceManager().getResource(new ResourceLocation("evergreen/misc/icon_16x.png")).getInputStream();
+//                highRes = this.getResourceManager().getResource(new ResourceLocation("evergreen/misc/icon_32x.png")).getInputStream();
+//
+//                if (lowRes != null && highRes != null) {
+//                    Display.setIcon(new ByteBuffer[] {this.readImageToBuffer(lowRes), this.readImageToBuffer(highRes)});
+//                }
+//            }
+//            catch (IOException ioexception) {
+//                logger.error("Couldn't set icon", ioexception);
+//            }
+//            finally
+//            {
+//                IOUtils.closeQuietly(lowRes);
+//                IOUtils.closeQuietly(highRes);
+//            }
+//        }
+//    }
 
 }

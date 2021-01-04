@@ -1,13 +1,15 @@
 /*
- * Copyright (C) [2020] [Evergreen]
+ * Copyright (C) Evergreen [2020 - 2021]
  * This program comes with ABSOLUTELY NO WARRANTY
  * This is free software, and you are welcome to redistribute it
- * under certain conditions
+ * under the certain conditions that can be found here
+ * https://www.gnu.org/licenses/lgpl-3.0.en.html
  */
 
 package net.evergreen.client.mod;
 
 import net.evergreen.client.Evergreen;
+import net.evergreen.client.event.EventRenderGameOverlay;
 import net.evergreen.client.setting.*;
 import net.evergreen.client.utils.json.BetterJsonObject;
 import net.minecraft.client.Minecraft;
@@ -32,12 +34,22 @@ public abstract class Mod {
 
     protected final List<Setting<?>> settings;
 
+    /* For hud mods */
+    private boolean hud;
+    protected int x = 0;
+    protected int y = 0;
+    protected float scale = 1;
+
     public Mod() {
         this.settings = new ArrayList<>();
         this.mc = Minecraft.getMinecraft();
         this.enabled = false;
         this.configFile = new File(new File(Evergreen.dataDir, "mods"), getMetadata().getName() + ".json");
         discoverSettings();
+    }
+
+    public void setHudMod(boolean state) {
+        this.hud = state;
     }
 
     public final List<Setting<?>> getSettings() {
@@ -83,6 +95,16 @@ public abstract class Mod {
      * @return instance of child class
      */
     protected abstract Mod getSelf();
+
+    /**
+     * Used for HUD mods, whether or not the mod will render or not
+     * is up to Evergreen itself and not the mod.
+     *
+     * @author isXander
+     */
+    public void render(EventRenderGameOverlay event) {
+
+    }
 
     /**
      * Adds setting to internal list

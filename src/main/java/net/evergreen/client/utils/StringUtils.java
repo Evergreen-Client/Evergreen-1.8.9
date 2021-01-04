@@ -1,8 +1,9 @@
 /*
- * Copyright (C) [2020] [Evergreen]
+ * Copyright (C) Evergreen [2020 - 2021]
  * This program comes with ABSOLUTELY NO WARRANTY
  * This is free software, and you are welcome to redistribute it
- * under certain conditions
+ * under the certain conditions that can be found here
+ * https://www.gnu.org/licenses/lgpl-3.0.en.html
  */
 
 package net.evergreen.client.utils;
@@ -18,6 +19,10 @@ public class StringUtils {
             sb.replace(sb.length() - 5, sb.length(), "...");
         }
         return sb.toString();
+    }
+
+    public static void drawCenteredString(FontRenderer fr, String text, float x, float y, int color, boolean shadow) {
+        fr.drawString(text, x - (fr.getStringWidth(text) / 2f), y, color, shadow);
     }
 
 }
