@@ -5,15 +5,15 @@
   "refmap": "mixins.evergreen.refmap.json",
   "verbose": true,
   "mixins": [
-    "com.evergreenclient.client.mixins.inject.MixinEntityFX",
-    "com.evergreenclient.client.mixins.inject.MixinEntityPlayerSP",
-    "com.evergreenclient.client.mixins.inject.MixinGuiChat",
-    "com.evergreenclient.client.mixins.inject.MixinGuiIngame",
-    "com.evergreenclient.client.mixins.inject.MixinGuiMainMenu",
-    "com.evergreenclient.client.mixins.inject.MixinLayerArmorBase",
-    "com.evergreenclient.client.mixins.inject.MixinMinecraft",
-    "com.evergreenclient.client.mixins.inject.MixinNetHandlerPlayClient",
-    "com.evergreenclient.client.mixins.inject.MixinPlayerControllerMP",
-    "com.evergreenclient.client.mixins.inject.MixinWorld"
+    "MixinEntityFX",
+    "MixinEntityPlayerSP",
+    "MixinGuiChat",
+    "MixinGuiIngame",
+    "MixinGuiMainMenu",
+    "MixinLayerArmorBase",
+    "MixinMinecraft",
+    "MixinNetHandlerPlayClient",
+    "MixinPlayerControllerMP",
+    "MixinWorld"
   ]
 }
