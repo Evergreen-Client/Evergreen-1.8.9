@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -49,6 +50,13 @@ public abstract class Mod {
         discoverSettings();
     }
 
+    /**
+     * This should be in the constructor but a parameter
+     * in it would need every mod to add a constructor
+     *
+     * @param state new hud state
+     * @author isXander
+     */
     public void setHudMod(boolean state) {
         this.hud = state;
     }
@@ -111,16 +119,10 @@ public abstract class Mod {
      * Adds setting to internal list
      *
      * @param settings settings to add
+     * @author isXander
      */
     protected final void addSetting(Setting<?>... settings) {
-        for (Setting<?> s : settings) {
-            if (!s.getJsonKeyName().startsWith("_")) {
-                this.settings.add(s);
-            }
-            else {
-                Evergreen.logger.warn("Settings that begin with \"_\" are not allowed, skipping.");
-            }
-        }
+        Collections.addAll(this.settings, settings);
     }
 
     /**
@@ -173,6 +175,11 @@ public abstract class Mod {
         }
     }
 
+    /**
+     * Gets JSON object from file and passes it to parsing function
+     *
+     * @author isXander
+     */
     public final void loadSettings() {
         Evergreen.logger.info("Loading " + getMetadata().getName() + " Mod.");
         try {
@@ -184,6 +191,11 @@ public abstract class Mod {
         }
     }
 
+    /**
+     * Adds all settings to json object and other things such as positioning
+     *
+     * @author isXander
+     */
     public final void saveSettings() {
         Evergreen.logger.info("Saving " + getMetadata().getName() + " Mod.");
         try {
@@ -195,8 +207,16 @@ public abstract class Mod {
                 throw new ReportedException(CrashReport.makeCrashReport(new Throwable(), "Could not save " + getMetadata().getName() + " Mod configuration. Cannot continue."));
             }
 
+            BetterJsonObject rootObject = new BetterJsonObject();
             BetterJsonObject settingsObject = new BetterJsonObject();
-            settingsObject.addProperty("_enabled", enabled);
+
+            rootObject.addProperty("enabled", enabled);
+            if (hud) {
+                rootObject.addProperty("x", x);
+                rootObject.addProperty("y", y);
+                rootObject.addProperty("scale", scale);
+            }
+
             for (Setting<?> s : settings) {
                 System.out.println(s);
                 switch (s.type()) {
@@ -219,23 +239,9 @@ public abstract class Mod {
                         settingsObject.addProperty(s.getJsonKeyName(), (String) s.get());
                         break;
                 }
-//                if (s.get() instanceof Boolean)
-//                    settingsObject.addProperty(s.getJsonKeyName(), (Boolean) s.get());
-//                else if (s.get() instanceof Float)
-//                    settingsObject.addProperty(s.getJsonKeyName(), (Float) s.get());
-//                else if (s.get() instanceof Color)
-//                    settingsObject.addProperty(s.getJsonKeyName(), ((Color)s.get()).getRGB());
-//                else if (s.get() instanceof Integer)
-//                    settingsObject.addProperty(s.getJsonKeyName(), (Integer) s.get());
-//                else if (s.get() instanceof SettingArray)
-//                    settingsObject.addProperty(s.getJsonKeyName(), ((SettingArray) s.get()).getIndex());
-//                else if (s.get() instanceof String)
-//                    settingsObject.addProperty(s.getJsonKeyName(), (String) s.get());
-//                else
-//                    Evergreen.logger.warn("Generic or unknown setting detected, ignoring.");
             }
-
-            settingsObject.writeToFile(configFile);
+            rootObject.add("settings", settingsObject);
+            rootObject.writeToFile(configFile);
         }
         catch (IOException e) {
             Evergreen.logger.error("Failed to save " + getMetadata().getName() + " Mod -- something went very wrong.");
@@ -243,40 +249,80 @@ public abstract class Mod {
         }
     }
 
+    /**
+     * Converts JSON to all the settings and positioning stuff
+     *
+     * @param o object to be parsed
+     * @author isXander
+     */
     @SuppressWarnings("unchecked")
     private void parseSettings(BetterJsonObject o) {
         // Nested for loops are bad and there is probably a miles better way to do this.
         // Loops through every key, finds the setting with the name of the key and parses accordingly
         for (String key : o.getAllKeys()) {
-            for (Setting<?> s : settings) {
-                if (key.equals("_enabled"))
-                    setEnabled(o.optBoolean("_enabled"));
-                else if (s.getJsonKeyName().equals(key)) {
-                    if (s.get() instanceof Boolean)
-                        ((Setting<Boolean>)s).set(o.optBoolean(key));
-                    else if (s.get() instanceof Double)
-                        ((Setting<Double>)s).set(o.optDouble(key));
-                    else if (s.get() instanceof Color)
-                        ((Setting<Color>) s).set(new Color(o.optInt(key)));
-                    else if (s.get() instanceof String)
-                        ((Setting<String>)s).set(o.optString(key));
-                    else if (s.get() instanceof Float)
-                        ((Setting<Float>)s).set(new Double(o.optDouble(key)).floatValue());
-                    else if (s.get() instanceof Integer)
-                        ((Setting<Integer>)s).set(o.optInt(key));
-                    else if (s.get() instanceof SettingArray)
-                        ((Setting<SettingArray>)s).get().setIndex(o.optInt(key));
-                    else
-                        Evergreen.logger.warn("Generic or unknown setting detected, ignoring.");
-                }
+            switch (key) {
+                case "enabled":
+                    setEnabled(o.optBoolean(key));
+                    break;
+                case "x":
+                    x = o.optInt(key);
+                    break;
+                case "y":
+                    y = o.optInt(key);
+                    break;
+                case "scale":
+                    scale = (float) o.optDouble(key);
+                    break;
+                case "settings":
+                    for (String k : new BetterJsonObject(o.get(key).getAsJsonObject()).getAllKeys()) {
+                        for (Setting<?> s : settings) {
+                            if (s.getJsonKeyName().equals(k)) {
+                                switch (s.type()) {
+                                    case TEXT:
+                                        ((Setting<String>) s).set(o.optString(k));
+                                        break;
+                                    case ARRAY:
+                                        ((Setting<SettingArray>) s).get().setIndex(o.optInt(k));
+                                        break;
+                                    case COLOR:
+                                        ((Setting<Color>) s).set(new Color(o.optInt(k)));
+                                        break;
+                                    case FLOAT:
+                                        ((Setting<Float>) s).set(new Double(o.optDouble(k)).floatValue());
+                                        break;
+                                    case BOOLEAN:
+                                        ((Setting<Boolean>) s).set(o.optBoolean(k));
+                                        break;
+                                    case INTEGER:
+                                        ((Setting<Integer>) s).set(o.optInt(k));
+                                        break;
+                                }
+                            }
+                        }
+                    }
+                    break;
             }
+
         }
     }
 
+    /**
+     * Used for bunch of stuff
+     * Can be used in mod events for when they aren't enabled
+     *
+     * @return is enabled
+     * @author isXander
+     */
     public boolean isEnabled() {
         return enabled;
     }
 
+    /**
+     * Sets the enabled state of the mod
+     *
+     * @param state new state
+     * @author isXander
+     */
     public void setEnabled(boolean state) {
         enabled = state;
         if (state)
@@ -285,14 +331,27 @@ public abstract class Mod {
             onDisabled();
     }
 
+    /**
+     * Used when guis need to toggle
+     */
     public void toggle() {
         setEnabled(!isEnabled());
     }
 
+    /**
+     * For mods to use as an event
+     *
+     * @author isXander
+     */
     protected void onEnabled() {
 
     }
 
+    /**
+     * For mods to use as an event
+     *
+     * @author isXander
+     */
     protected void onDisabled() {
 
     }

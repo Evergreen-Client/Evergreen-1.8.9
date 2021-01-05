@@ -22,16 +22,31 @@ public class MathUtils {
     }
 
     /**
+     * Clamps value between min & max
+     *
+     * @param val value to clamp
+     * @param min min value
+     * @param max max value
+     * @return clamped value
+     * @author isXander
+     */
+    public static float clamp(float val, float min, float max) {
+        if (val > max) val = max;
+        else if (val < min) val = min;
+        return val;
+    }
+
+    /**
      * Linearly interpolates between a and b by t.
      *
-     * @param a Start value
-     * @param b End value
-     * @param t Interpolation between two floats
+     * @param start Start value
+     * @param end End value
+     * @param interpolation Interpolation between two floats
      * @return interpolated value between a - b
      * @author isXander
      */
-    public static float lerp(float a, float b, float t) {
-        return a + (b - a) * MathUtils.clamp01(t);
+    public static float lerp(float start, float end, float interpolation) {
+        return start + (end - start) * MathUtils.clamp01(interpolation);
     }
 
     /**
