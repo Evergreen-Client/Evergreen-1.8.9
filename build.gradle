@@ -24,7 +24,7 @@ apply plugin: 'org.spongepowered.mixin'
 apply plugin: 'java'
 
 version = "1.0"
-group = "net.evergreen"
+group = "com.evergreenclient"
 archivesBaseName = "Evergreen Client"
 
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_1_8
@@ -32,7 +32,7 @@ compileJava.options.encoding = 'UTF-8'
 
 minecraft {
     version = "1.8.9"
-    tweakClass = "net.evergreen.client.mixins.EvergreenTweaker"
+    tweakClass = "com.evergreenclient.client.mixins.EvergreenTweaker"
     runDir = "run"
     mappings = "stable_22"
 }
@@ -89,7 +89,7 @@ jar {
 
     manifest.attributes(
             "MixinConfigs": 'mixins.evergreen.json',
-            "TweakClass": 'net.evergreen.client.mixins.EvergreenTweaker',
+            "TweakClass": 'com.evergreenclient.client.mixins.EvergreenTweaker',
             "TweakOrder": 0,
             "Manifest-Version": 1.0
     )
